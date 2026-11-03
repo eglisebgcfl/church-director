@@ -63,15 +63,15 @@ const sb=supabase.createClient('https://jcjuavvnffcqmvfqfhkf.supabase.co','sb_pu
 
 const D={
 email:['Courriel','Email'],pw:['Mot de passe','Password'],login:['Se connecter','Log in'],out:['Déconnexion','Log out'],
-att:['Présences','Attendance'],dir:['Annuaire','Directory'],ppl:['Personnes','People'],date:['Date','Date'],
+att:['Présences','Attendance'],dir:['Annuaire','Directory'],ppl:['Membres','Members'],date:['Date','Date'],
 leg:['P = présent, R = en retard, A = absent','P = present, R = late, A = absent'],
 rest:['Marquer le reste présent','Mark the rest present'],save:['Enregistrer','Save'],
 saved:['Présences enregistrées.','Attendance saved.'],nog:['Aucun groupe n’est assigné à votre compte.','No group is assigned to your account.'],
 nom:['Aucun membre dans ce groupe.','No members in this group.'],bad:['Courriel ou mot de passe incorrect.','Wrong email or password.'],
 nop:['Ce compte n’a pas de rôle. Contactez l’administrateur.','This account has no role. Contact the administrator.'],
-add:['Ajouter une personne','Add a person'],first:['Prénom','First name'],last:['Nom','Last name'],phone:['Téléphone','Phone'],
-dob:['Date de naissance','Date of birth'],mar:['Situation familiale','Family status'],hh:['Ménage','Household'],
-nh:['Nouveau ménage','New household'],hn:['Nom du ménage','Household name'],adr:['Adresse','Address'],city:['Ville','City'],
+add:['Ajouter un membre','Add a member'],first:['Prénom','First name'],last:['Nom','Last name'],phone:['Téléphone','Phone'],
+dob:['Date de naissance','Date of birth'],mar:['Situation familiale','Family status'],hh:['Famille (ménage)','Family (household)'],
+nh:['Nouvelle famille','New family'],hn:['Nom de la famille','Family name'],adr:['Adresse','Address'],city:['Ville','City'],
 sh:['Afficher dans l’annuaire','Show in directory'],bd:['Anniversaire (jour/mois)','Birthday (day/month)'],
 gr:['Groupes','Groups'],print:['Imprimer / PDF','Print / PDF'],err:['Erreur : ','Error: '],none:['—','—'],
 single:['Célibataire','Single'],married:['Marié(e)','Married'],separated:['Séparé(e)','Separated'],
@@ -228,9 +228,11 @@ async function viewPpl(){
   const personal=`<div class="row"><input name="first" placeholder="${t('first')}" required><input name="last" placeholder="${t('last')}" required></div>
   <label>Nom préféré (surnom)<input name="pref"></label>
   <div class="row"><label>${t('dob')}<input name="dob" type="date"></label><label>Sexe<select name="sex"><option value="">—</option><option value="M">Masculin</option><option value="F">Féminin</option></select></label></div>
-  <label>${t('mar')}<select name="mar"><option value="">${t('none')}</option>${['single','married','separated','divorced','widowed'].map(k=>`<option value="${k}">${t(k)}</option>`).join('')}</select></label>
-  <div class="row"><label>Conjoint(e), si marié(e)<input name="spouse"></label><label>Date de mariage<input name="mdate" type="date"></label></div>
+  <label>${t('mar')}<select name="mar" id="mar"><option value="">${t('none')}</option>${['single','married','separated','divorced','widowed'].map(k=>`<option value="${k}">${t(k)}</option>`).join('')}</select></label>
+  <div id="sp" class="row" style="display:none"><label>Nom du conjoint / de la conjointe<input name="spouse"></label><label>Date de mariage<input name="mdate" type="date"></label></div>
+  <label>Rôle dans la famille<select name="role"><option value="">—</option><option value="husband">Époux (mari)</option><option value="wife">Épouse (femme)</option><option value="child">Enfant</option><option value="other">Autre</option></select></label>
   <label>${t('hh')}<select name="hid" id="hid"><option value="new">${t('nh')}</option>${H.map(x=>`<option value="${x.id}">${esc(x.name)}</option>`).join('')}</select></label>
+  <p class="leg">Les membres d’une même famille partagent la même adresse. Choisissez une famille existante pour ajouter un conjoint ou un enfant.</p>
   <div id="nh" class="row"><input name="hn" placeholder="${t('hn')}"><input name="adr" placeholder="${t('adr')}"><input name="city" placeholder="${t('city')}"></div>
   <div class="row"><input name="phone" type="tel" placeholder="${t('phone')}"><input name="email" type="email" placeholder="${t('email')}"></div>
   <label>Profession / occupation<input name="job"></label>`;
@@ -246,6 +248,7 @@ async function viewPpl(){
   <h2 class="sp">${t('ppl')} (${P.length})</h2>`
   +P.map(x=>`<div class="pr"><span>${esc(x.first_name)} ${esc(x.last_name)}<br><small class="mut">${esc(x.households?.name||'')}${x.phone?', '+esc(x.phone):''}</small></span></div>`).join('');
   const hid=$('#hid');hid.onchange=()=>{$('#nh').style.display=hid.value==='new'?'':'none'};
+  const mar=$('#mar');mar.onchange=()=>{$('#sp').style.display=mar.value==='married'?'':'none'};
   $('#pf').onsubmit=addPerson;
 }
 async function addPerson(e){
@@ -263,7 +266,7 @@ async function addPerson(e){
       const {data,error}=await sb.from('households').insert({name:v('hn')||v('last'),address:v('adr')||null,city:v('city')||null}).select('id').single();
       if(error)throw error;hid=data.id;
     }
-    const {data:p,error:e1}=await sb.from('people').insert({household_id:hid,first_name:v('first'),last_name:v('last'),phone:v('phone')||null,email:v('email')||null,
+    const {data:p,error:e1}=await sb.from('people').insert({household_id:hid,household_role:v('role')||null,first_name:v('first'),last_name:v('last'),phone:v('phone')||null,email:v('email')||null,
       share_address:c('share_address'),share_phone:c('share_phone'),share_email:c('share_email'),share_birthday:c('share_birthday')}).select('id').single();
     if(e1)throw e1;
     const {error:e2}=await sb.from('people_private').insert({person_id:p.id,dob:v('dob')||null,marital_status:v('mar')||null,sex:v('sex')||null,preferred_name:v('pref')||null,
