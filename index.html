@@ -22,7 +22,7 @@ main{max-width:46rem;margin:0 auto;padding:1rem}
 .login{max-width:24rem;margin-top:12vh}
 .login h1{font-size:1.6rem;margin:1rem 0}
 label{display:block;margin:.5rem 0;flex:1}
-input,select{font:inherit;padding:.55rem .7rem;border:1px solid var(--ln);border-radius:6px;background:var(--card);color:var(--ink);width:100%}
+input,select,textarea{font:inherit;padding:.55rem .7rem;border:1px solid var(--ln);border-radius:6px;background:var(--card);color:var(--ink);width:100%}
 .row{display:flex;gap:.5rem;flex-wrap:wrap;margin:.5rem 0}
 .row>*{flex:1;min-width:9rem}
 .btn{background:var(--pri);color:var(--onpri);border:0;padding:.65rem 1.1rem;border-radius:6px;font:inherit;cursor:pointer;list-style:none}
@@ -45,6 +45,11 @@ fieldset{border:1px solid var(--ln);border-radius:6px;margin:.75rem 0}
 .msg{color:var(--mut);min-height:1.4em}
 .sp{margin:1.5rem 0 .5rem;font-size:1.1rem}
 details form{padding:.75rem 0}
+.sec{border:1px solid var(--ln);border-radius:6px;margin:.5rem 0;background:var(--card)}
+.sec>summary{padding:.7rem .9rem;cursor:pointer;font-weight:600}
+.sec>summary::after{content:"+";float:right}
+.sec[open]>summary::after{content:"−"}
+.sec>div{padding:0 .9rem .9rem}
 :focus-visible{outline:3px solid var(--acc);outline-offset:2px}
 @media print{header,nav,.noprint{display:none!important}body{background:#fff;color:#000}}
 </style>
@@ -165,6 +170,54 @@ async function viewDir(){
 }
 
 /* ---------- People (admin) ---------- */
+const MIN=['Louange et Adoration','École du Dimanche','Ministère des Enfants','Jeunesse','Accueil','Technique / Multimédia','Évangélisation','Intercession','Service Communautaire','Administration','Autre'];
+const SPEC=[
+['Informations spirituelles',[
+['christ','Quand avez-vous accepté Jésus-Christ comme Seigneur et Sauveur ?','text'],
+['baptized','Avez-vous été baptisé(e) ?','yn'],
+['bapt_where','Si oui, quand et où ?','text'],
+['other_church','Avez-vous fréquenté une autre église auparavant ?','yn'],
+['other_church_name','Si oui, laquelle ?','text'],
+['since','Depuis quand fréquentez-vous notre église ?','text'],
+['wants_member','Souhaitez-vous devenir membre officiel de l’église ?','yn']]],
+['Implication dans le ministère',[
+['serving','Servez-vous actuellement dans un ministère ?','yn'],
+['serving_which','Si oui, lequel ?','text'],
+['wants_serve','Dans quel(s) ministère(s) aimeriez-vous servir ?','chk',MIN],
+['wants_serve_other','Autre ministère (précisez)','text'],
+['gifts','Quels dons spirituels, talents ou compétences Dieu vous a-t-Il donnés ?','area'],
+['volunteer','Seriez-vous disposé(e) à servir comme bénévole lors des activités spéciales ?','yn']]],
+['Communion et croissance spirituelle',[
+['cell','Participez-vous à un groupe de maison, une cellule ou une étude biblique ?','yn'],
+['mentor','Souhaitez-vous un accompagnement spirituel ou du mentorat ?','yn'],
+['growth','Dans quels domaines aimeriez-vous grandir spirituellement ?','area']]],
+['Communication',[
+['channel','Quel est votre moyen de communication préféré ?','sel',['Téléphone','SMS','Courriel','WhatsApp']],
+['wants_info','Souhaitez-vous recevoir :','chk',['Les annonces de l’église','Les sujets de prière','Les informations sur les événements','Les opportunités de service']]]],
+['Soins pastoraux',[
+['prayer','Avez-vous des besoins de prière particuliers ?','area'],
+['visit','Souhaitez-vous une visite pastorale ?','yn'],
+['situation','Y a-t-il une situation pour laquelle l’église peut vous accompagner ?','area']]],
+['Contact d’urgence',[
+['em_name','Nom du contact d’urgence','text'],
+['em_rel','Lien avec vous','text'],
+['em_phone','Téléphone du contact d’urgence','text']]],
+['Informations administratives',[
+['source','Comment avez-vous connu notre église ?','sel',['Famille','Ami(e)','Réseaux sociaux','Site Web','Événement spécial','Autre']],
+['source_other','Si autre, précisez','text'],
+['reg_date','Date d’inscription','date'],
+['received','Date de réception','date'],
+['status','Statut','sel',['Visiteur','Nouveau participant','Membre','Membre actif']],
+['pastoral_notes','Commentaires pastoraux','area']]]
+];
+const fld=([k,l,ty,o])=>{const n='a_'+k;
+  if(ty==='yn'||ty==='sel')return `<label>${l}<select name="${n}"><option value="">—</option>${(ty==='yn'?['Oui','Non']:o).map(x=>`<option>${x}</option>`).join('')}</select></label>`;
+  if(ty==='chk')return `<fieldset><legend>${l}</legend>${o.map(x=>`<label class="chk"><input type="checkbox" name="${n}" value="${x}"> ${x}</label>`).join('')}</fieldset>`;
+  if(ty==='area')return `<label>${l}<textarea name="${n}" rows="2"></textarea></label>`;
+  return `<label>${l}<input name="${n}" type="${ty==='date'?'date':'text'}"></label>`};
+const sec=(ti,body,o,id)=>`<details class="sec"${o?' open':''}${id?` id="${id}"`:''}><summary>${ti}</summary><div>${body}</div></details>`;
+function addKid(){$('#kids').insertAdjacentHTML('beforeend','<div class="row kid"><input name="kf" placeholder="Prénom de l’enfant"><input name="kd" type="date" aria-label="Date de naissance"><select name="ks"><option value="">Sexe</option><option value="M">Masculin</option><option value="F">Féminin</option></select></div>')}
+
 async function viewPpl(){
   const m=$('#main');
   const [h,g,p]=await Promise.all([
@@ -172,16 +225,24 @@ async function viewPpl(){
     sb.from('groups').select('id,name_fr,name_en').eq('active',true).order('name_fr'),
     sb.from('people').select('id,first_name,last_name,phone,households(name)').order('last_name')]);
   const H=h.data||[],G=g.data||[],P=p.data||[];
-  m.innerHTML=`<details><summary class="btn">${t('add')}</summary><form id="pf">
-  <div class="row"><input name="first" placeholder="${t('first')}" required><input name="last" placeholder="${t('last')}" required></div>
-  <div class="row"><input name="phone" type="tel" placeholder="${t('phone')}"><input name="email" type="email" placeholder="${t('email')}"></div>
-  <div class="row"><label>${t('dob')}<input name="dob" type="date"></label>
-  <label>${t('mar')}<select name="mar"><option value="">${t('none')}</option>${['single','married','separated','divorced','widowed'].map(k=>`<option value="${k}">${t(k)}</option>`).join('')}</select></label></div>
+  const personal=`<div class="row"><input name="first" placeholder="${t('first')}" required><input name="last" placeholder="${t('last')}" required></div>
+  <label>Nom préféré (surnom)<input name="pref"></label>
+  <div class="row"><label>${t('dob')}<input name="dob" type="date"></label><label>Sexe<select name="sex"><option value="">—</option><option value="M">Masculin</option><option value="F">Féminin</option></select></label></div>
+  <label>${t('mar')}<select name="mar"><option value="">${t('none')}</option>${['single','married','separated','divorced','widowed'].map(k=>`<option value="${k}">${t(k)}</option>`).join('')}</select></label>
+  <div class="row"><label>Conjoint(e), si marié(e)<input name="spouse"></label><label>Date de mariage<input name="mdate" type="date"></label></div>
   <label>${t('hh')}<select name="hid" id="hid"><option value="new">${t('nh')}</option>${H.map(x=>`<option value="${x.id}">${esc(x.name)}</option>`).join('')}</select></label>
   <div id="nh" class="row"><input name="hn" placeholder="${t('hn')}"><input name="adr" placeholder="${t('adr')}"><input name="city" placeholder="${t('city')}"></div>
-  <fieldset><legend>${t('sh')}</legend>${[['share_address','adr'],['share_phone','phone'],['share_email','email'],['share_birthday','bd']].map(([n,k])=>`<label class="chk"><input type="checkbox" name="${n}"> ${t(k)}</label>`).join('')}</fieldset>
+  <div class="row"><input name="phone" type="tel" placeholder="${t('phone')}"><input name="email" type="email" placeholder="${t('email')}"></div>
+  <label>Profession / occupation<input name="job"></label>`;
+  const last=`<fieldset><legend>${t('sh')}</legend>${[['share_address','adr'],['share_phone','phone'],['share_email','email'],['share_birthday','bd']].map(([n,k])=>`<label class="chk"><input type="checkbox" name="${n}"> ${t(k)}</label>`).join('')}</fieldset>
   <fieldset><legend>${t('gr')}</legend>${G.map(x=>`<label class="chk"><input type="checkbox" name="gr" value="${x.id}"> ${gname(x)}</label>`).join('')}</fieldset>
-  <button class="btn">${t('save')}</button><p class="msg" id="m3"></p></form></details>
+  <label class="chk"><input type="checkbox" name="consent"> Je certifie que les renseignements sont exacts et j’autorise l’église à les conserver pour les besoins administratifs, pastoraux et de communication (fiche signée reçue).</label>`;
+  m.innerHTML=`<details><summary class="btn">${t('add')}</summary><form id="pf">`
+  +sec('Informations personnelles',personal,1)
+  +sec('Informations familiales','<div id="kids"></div><button type="button" class="btn alt" onclick="addKid()">Ajouter un enfant</button>')
+  +SPEC.map(([ti,fs])=>sec(ti,fs.map(fld).join(''))).join('')
+  +sec('Annuaire, groupes et consentement',last,0,'sc')
+  +`<button class="btn">${t('save')}</button><p class="msg" id="m3"></p></form></details>
   <h2 class="sp">${t('ppl')} (${P.length})</h2>`
   +P.map(x=>`<div class="pr"><span>${esc(x.first_name)} ${esc(x.last_name)}<br><small class="mut">${esc(x.households?.name||'')}${x.phone?', '+esc(x.phone):''}</small></span></div>`).join('');
   const hid=$('#hid');hid.onchange=()=>{$('#nh').style.display=hid.value==='new'?'':'none'};
@@ -190,6 +251,12 @@ async function viewPpl(){
 async function addPerson(e){
   e.preventDefault();
   const f=e.target,v=n=>f.elements[n].value.trim(),c=n=>f.elements[n].checked,o=$('#m3');
+  if(!c('consent')){$('#sc').open=true;o.textContent='Cochez le consentement avant d’enregistrer.';return}
+  const ans={};
+  SPEC.forEach(([,fs])=>fs.forEach(([k,,ty])=>{
+    const els=[...f.querySelectorAll(`[name="a_${k}"]`)];
+    const val=ty==='chk'?els.filter(x=>x.checked).map(x=>x.value):(els[0]?.value||'').trim();
+    if(ty==='chk'?val.length:val)ans[k]=val}));
   try{
     let hid=f.elements.hid.value;
     if(hid==='new'){
@@ -199,10 +266,18 @@ async function addPerson(e){
     const {data:p,error:e1}=await sb.from('people').insert({household_id:hid,first_name:v('first'),last_name:v('last'),phone:v('phone')||null,email:v('email')||null,
       share_address:c('share_address'),share_phone:c('share_phone'),share_email:c('share_email'),share_birthday:c('share_birthday')}).select('id').single();
     if(e1)throw e1;
-    const {error:e2}=await sb.from('people_private').insert({person_id:p.id,dob:v('dob')||null,marital_status:v('mar')||null});
+    const {error:e2}=await sb.from('people_private').insert({person_id:p.id,dob:v('dob')||null,marital_status:v('mar')||null,sex:v('sex')||null,preferred_name:v('pref')||null,
+      occupation:v('job')||null,spouse_name:v('spouse')||null,marriage_date:v('mdate')||null,answers:ans,consent_at:today()});
     if(e2)throw e2;
     const ids=[...f.querySelectorAll('[name=gr]:checked')].map(x=>x.value);
     if(ids.length){const {error:e3}=await sb.from('memberships').insert(ids.map(group_id=>({group_id,person_id:p.id})));if(e3)throw e3}
+    const kids=[...f.querySelectorAll('.kid')].map(r=>({f:r.querySelector('[name=kf]').value.trim(),d:r.querySelector('[name=kd]').value,s:r.querySelector('[name=ks]').value})).filter(k=>k.f);
+    if(kids.length){
+      const {data:ks,error:e4}=await sb.from('people').insert(kids.map(k=>({household_id:hid,first_name:k.f,last_name:v('last'),household_role:'child'}))).select('id');
+      if(e4)throw e4;
+      const {error:e5}=await sb.from('people_private').insert(ks.map((r,i)=>({person_id:r.id,dob:kids[i].d||null,sex:kids[i].s||null})));
+      if(e5)throw e5;
+    }
     viewPpl();
   }catch(err){o.textContent=t('err')+err.message}
 }
