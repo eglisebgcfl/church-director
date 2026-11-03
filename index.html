@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Annuaire</title>
+<style>
+:root{--bg:#f4f6f3;--ink:#1d2b2a;--mut:#5e6d6b;--pri:#1f5c5a;--onpri:#fff;--acc:#c99a2e;--card:#fff;--ln:#d9dfdb;--ok:#2e7d4f;--wa:#b7791f;--no:#b23a3a;color-scheme:light}
+@media(prefers-color-scheme:dark){:root{--bg:#121a19;--ink:#e6eeec;--mut:#9fb0ad;--pri:#4fa39f;--onpri:#0e1615;--acc:#e0b34d;--card:#1b2625;--ln:#2e3b39;--ok:#5cc08a;--wa:#e0a84f;--no:#e07a7a;color-scheme:dark}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:1rem/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}
+h1,h2{font-family:Georgia,"Times New Roman",serif;font-weight:600;margin:0}
+header{display:flex;flex-wrap:wrap;gap:.5rem;align-items:center;justify-content:space-between;padding:.75rem 1rem;background:var(--pri);color:var(--onpri)}
+header h1{font-size:1.2rem}
+.tools{display:flex;gap:.35rem}
+.tools button{background:transparent;color:inherit;border:1px solid currentColor;border-radius:6px;padding:.3rem .6rem;font:inherit;cursor:pointer}
+.login .tools{justify-content:flex-end;color:var(--pri)}
+nav{display:flex;gap:.25rem;padding:0 1rem;border-bottom:1px solid var(--ln);background:var(--card);overflow-x:auto}
+nav button{background:none;border:0;padding:.8rem 1rem;font:inherit;color:var(--mut);border-bottom:3px solid transparent;cursor:pointer;white-space:nowrap}
+nav button.on{color:var(--ink);border-color:var(--acc);font-weight:600}
+main{max-width:46rem;margin:0 auto;padding:1rem}
+.login{max-width:24rem;margin-top:12vh}
+.login h1{font-size:1.6rem;margin:1rem 0}
+label{display:block;margin:.5rem 0;flex:1}
+input,select{font:inherit;padding:.55rem .7rem;border:1px solid var(--ln);border-radius:6px;background:var(--card);color:var(--ink);width:100%}
+.row{display:flex;gap:.5rem;flex-wrap:wrap;margin:.5rem 0}
+.row>*{flex:1;min-width:9rem}
+.btn{background:var(--pri);color:var(--onpri);border:0;padding:.65rem 1.1rem;border-radius:6px;font:inherit;cursor:pointer;list-style:none}
+.btn.alt{background:none;color:var(--pri);border:1px solid var(--pri)}
+summary::-webkit-details-marker{display:none}
+.pr{display:flex;align-items:center;justify-content:space-between;gap:.5rem;padding:.6rem 0;border-bottom:1px solid var(--ln)}
+.st{display:flex;gap:.35rem}
+.st button{width:2.6rem;height:2.6rem;border-radius:6px;border:1px solid var(--ln);background:var(--card);color:var(--ink);font:inherit;font-weight:600;cursor:pointer}
+.st .P.on{background:var(--ok);border-color:var(--ok);color:#fff}
+.st .R.on{background:var(--wa);border-color:var(--wa);color:#fff}
+.st .A.on{background:var(--no);border-color:var(--no);color:#fff}
+.fam{padding:.8rem 0;border-bottom:1px solid var(--ln)}
+.fam h2{font-size:1.1rem;margin-bottom:.25rem}
+.fam p{margin:.35rem 0}
+fieldset{border:1px solid var(--ln);border-radius:6px;margin:.75rem 0}
+.chk{display:inline-flex;align-items:center;gap:.4rem;margin:.25rem .75rem .25rem 0}
+.chk input{width:auto}
+.mut,.leg{color:var(--mut)}
+.leg{font-size:.9rem;margin:.25rem 0 .5rem}
+.msg{color:var(--mut);min-height:1.4em}
+.sp{margin:1.5rem 0 .5rem;font-size:1.1rem}
+details form{padding:.75rem 0}
+:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+@media print{header,nav,.noprint{display:none!important}body{background:#fff;color:#000}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script>
+const CHURCH='Nom de l’église'; // <-- write your church name here
+const sb=supabase.createClient('https://jcjuavvnffcqmvfqfhkf.supabase.co','sb_publishable_dA4mx9d_4UNSUQeK7XRMLg_JRHNvbD2');
+
+const D={
+email:['Courriel','Email'],pw:['Mot de passe','Password'],login:['Se connecter','Log in'],out:['Déconnexion','Log out'],
+att:['Présences','Attendance'],dir:['Annuaire','Directory'],ppl:['Personnes','People'],date:['Date','Date'],
+leg:['P = présent, R = en retard, A = absent','P = present, R = late, A = absent'],
+rest:['Marquer le reste présent','Mark the rest present'],save:['Enregistrer','Save'],
+saved:['Présences enregistrées.','Attendance saved.'],nog:['Aucun groupe n’est assigné à votre compte.','No group is assigned to your account.'],
+nom:['Aucun membre dans ce groupe.','No members in this group.'],bad:['Courriel ou mot de passe incorrect.','Wrong email or password.'],
+nop:['Ce compte n’a pas de rôle. Contactez l’administrateur.','This account has no role. Contact the administrator.'],
+add:['Ajouter une personne','Add a person'],first:['Prénom','First name'],last:['Nom','Last name'],phone:['Téléphone','Phone'],
+dob:['Date de naissance','Date of birth'],mar:['Situation familiale','Family status'],hh:['Ménage','Household'],
+nh:['Nouveau ménage','New household'],hn:['Nom du ménage','Household name'],adr:['Adresse','Address'],city:['Ville','City'],
+sh:['Afficher dans l’annuaire','Show in directory'],bd:['Anniversaire (jour/mois)','Birthday (day/month)'],
+gr:['Groupes','Groups'],print:['Imprimer / PDF','Print / PDF'],err:['Erreur : ','Error: '],none:['—','—'],
+single:['Célibataire','Single'],married:['Marié(e)','Married'],separated:['Séparé(e)','Separated'],
+divorced:['Divorcé(e)','Divorced'],widowed:['Veuf / veuve','Widowed']
+};
+let lang=localStorage.getItem('lang')||'fr',fs=+localStorage.getItem('fs')||16,prof=null,tab='att';
+let cur={people:[],st:{}};
+const $=s=>document.querySelector(s);
+const t=k=>D[k][lang==='fr'?0:1];
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const today=()=>{const d=new Date();return new Date(d-d.getTimezoneOffset()*6e4).toISOString().slice(0,10)};
+const gname=g=>esc(lang==='fr'?g.name_fr:g.name_en);
+
+function setLang(l){lang=l;localStorage.setItem('lang',l);render()}
+function setFs(d){fs=Math.min(24,Math.max(13,fs+d));localStorage.setItem('fs',fs);document.documentElement.style.fontSize=fs+'px'}
+const tools=extra=>`<span class="tools"><button onclick="setLang(lang==='fr'?'en':'fr')">${lang==='fr'?'EN':'FR'}</button><button onclick="setFs(-1)" aria-label="A-">A−</button><button onclick="setFs(1)" aria-label="A+">A+</button>${extra||''}</span>`;
+
+function render(){document.documentElement.lang=lang;document.documentElement.style.fontSize=fs+'px';prof?shell():loginView()}
+
+function loginView(msg){
+  $('#app').innerHTML=`<main class="login">${tools()}<h1>${esc(CHURCH)}</h1>
+  <form id="lf"><label>${t('email')}<input type="email" id="em" required autocomplete="username"></label>
+  <label>${t('pw')}<input type="password" id="pw" required autocomplete="current-password"></label>
+  <p class="msg" id="lm">${msg||''}</p><button class="btn">${t('login')}</button></form></main>`;
+  $('#lf').onsubmit=async e=>{e.preventDefault();
+    const {error}=await sb.auth.signInWithPassword({email:$('#em').value.trim(),password:$('#pw').value});
+    if(error)return $('#lm').textContent=t('bad');
+    boot()};
+}
+
+async function boot(){
+  const {data:{session}}=await sb.auth.getSession();
+  if(!session)return render();
+  const {data}=await sb.from('profiles').select('role,full_name').eq('id',session.user.id).maybeSingle();
+  if(!data){await sb.auth.signOut();prof=null;return loginView(t('nop'))}
+  prof=data;tab='att';render();
+}
+
+function shell(){
+  const tabs=['att','dir'].concat(prof.role==='admin'?['ppl']:[]);
+  $('#app').innerHTML=`<header><h1>${esc(CHURCH)}</h1>${tools(`<button onclick="logout()">${t('out')}</button>`)}</header>
+  <nav>${tabs.map(k=>`<button class="${tab===k?'on':''}" onclick="go('${k}')">${t(k)}</button>`).join('')}</nav><main id="main"></main>`;
+  ({att:viewAtt,dir:viewDir,ppl:viewPpl})[tab]();
+}
+function go(k){tab=k;shell()}
+async function logout(){await sb.auth.signOut();prof=null;render()}
+
+/* ---------- Attendance ---------- */
+async function viewAtt(){
+  const m=$('#main');
+  const {data:gs}=await sb.from('groups').select('id,name_fr,name_en').eq('active',true).order('name_fr');
+  if(!gs||!gs.length){m.innerHTML=`<p>${t('nog')}</p>`;return}
+  m.innerHTML=`<div class="row"><select id="g">${gs.map(g=>`<option value="${g.id}">${gname(g)}</option>`).join('')}</select>
+  <input type="date" id="d" value="${today()}" aria-label="${t('date')}"></div>
+  <p class="leg">${t('leg')}</p><div id="list"></div><p class="msg" id="m2"></p>`;
+  $('#g').onchange=$('#d').onchange=loadAtt;
+  loadAtt();
+}
+async function loadAtt(){
+  const g=$('#g').value,d=$('#d').value;if(!d)return;
+  const {data:mem}=await sb.from('memberships').select('people(id,first_name,last_name)').eq('group_id',g);
+  cur.people=(mem||[]).map(x=>x.people).filter(Boolean).sort((a,b)=>(a.last_name+a.first_name).localeCompare(b.last_name+b.first_name));
+  cur.st={};
+  const {data:s}=await sb.from('sessions').select('id').eq('group_id',g).eq('session_date',d).maybeSingle();
+  if(s){const {data:a}=await sb.from('attendance').select('person_id,status').eq('session_id',s.id);(a||[]).forEach(r=>cur.st[r.person_id]=r.status)}
+  $('#m2').textContent='';drawAtt();
+}
+function drawAtt(){
+  const l=$('#list');if(!l)return;
+  if(!cur.people.length){l.innerHTML=`<p>${t('nom')}</p>`;return}
+  l.innerHTML=cur.people.map(p=>`<div class="pr"><span>${esc(p.first_name)} ${esc(p.last_name)}</span><span class="st">${['P','R','A'].map(k=>`<button class="${k}${cur.st[p.id]===k?' on':''}" onclick="mark('${p.id}','${k}')">${k}</button>`).join('')}</span></div>`).join('')
+  +`<div class="row"><button class="btn alt" onclick="restP()">${t('rest')}</button><button class="btn" onclick="saveAtt()">${t('save')}</button></div>`;
+}
+function mark(id,k){cur.st[id]=k;drawAtt()}
+function restP(){cur.people.forEach(p=>{if(!cur.st[p.id])cur.st[p.id]='P'});drawAtt()}
+async function saveAtt(){
+  const g=$('#g').value,d=$('#d').value,o=$('#m2');
+  const {data:s,error:e}=await sb.from('sessions').upsert({group_id:g,session_date:d},{onConflict:'group_id,session_date'}).select('id').single();
+  if(e)return o.textContent=t('err')+e.message;
+  const rows=cur.people.filter(p=>cur.st[p.id]).map(p=>({session_id:s.id,person_id:p.id,status:cur.st[p.id]}));
+  if(rows.length){const {error}=await sb.from('attendance').upsert(rows,{onConflict:'session_id,person_id'});if(error)return o.textContent=t('err')+error.message}
+  o.textContent=t('saved');
+}
+
+/* ---------- Directory ---------- */
+async function viewDir(){
+  const m=$('#main');
+  const {data,error}=await sb.from('directory').select('*').order('last_name').order('first_name');
+  if(error)return m.innerHTML=`<p>${t('err')}${esc(error.message)}</p>`;
+  const fam={};(data||[]).forEach(p=>{(fam[p.household_id||p.person_id]??=[]).push(p)});
+  m.innerHTML=`<div class="row noprint"><button class="btn alt" onclick="window.print()">${t('print')}</button></div>`
+  +Object.values(fam).map(f=>{
+    const adr=f.map(p=>[p.address,p.city].filter(Boolean).join(', ')).find(Boolean);
+    return `<section class="fam"><h2>${esc(f[0].last_name)}</h2>${f.map(p=>`<p><strong>${esc(p.first_name)} ${esc(p.last_name)}</strong>${[p.phone,p.email,p.birthday_day_month].filter(Boolean).map(x=>`<br>${esc(x)}`).join('')}</p>`).join('')}${adr?`<p class="mut">${esc(adr)}</p>`:''}</section>`;
+  }).join('');
+}
+
+/* ---------- People (admin) ---------- */
+async function viewPpl(){
+  const m=$('#main');
+  const [h,g,p]=await Promise.all([
+    sb.from('households').select('id,name').order('name'),
+    sb.from('groups').select('id,name_fr,name_en').eq('active',true).order('name_fr'),
+    sb.from('people').select('id,first_name,last_name,phone,households(name)').order('last_name')]);
+  const H=h.data||[],G=g.data||[],P=p.data||[];
+  m.innerHTML=`<details><summary class="btn">${t('add')}</summary><form id="pf">
+  <div class="row"><input name="first" placeholder="${t('first')}" required><input name="last" placeholder="${t('last')}" required></div>
+  <div class="row"><input name="phone" type="tel" placeholder="${t('phone')}"><input name="email" type="email" placeholder="${t('email')}"></div>
+  <div class="row"><label>${t('dob')}<input name="dob" type="date"></label>
+  <label>${t('mar')}<select name="mar"><option value="">${t('none')}</option>${['single','married','separated','divorced','widowed'].map(k=>`<option value="${k}">${t(k)}</option>`).join('')}</select></label></div>
+  <label>${t('hh')}<select name="hid" id="hid"><option value="new">${t('nh')}</option>${H.map(x=>`<option value="${x.id}">${esc(x.name)}</option>`).join('')}</select></label>
+  <div id="nh" class="row"><input name="hn" placeholder="${t('hn')}"><input name="adr" placeholder="${t('adr')}"><input name="city" placeholder="${t('city')}"></div>
+  <fieldset><legend>${t('sh')}</legend>${[['share_address','adr'],['share_phone','phone'],['share_email','email'],['share_birthday','bd']].map(([n,k])=>`<label class="chk"><input type="checkbox" name="${n}"> ${t(k)}</label>`).join('')}</fieldset>
+  <fieldset><legend>${t('gr')}</legend>${G.map(x=>`<label class="chk"><input type="checkbox" name="gr" value="${x.id}"> ${gname(x)}</label>`).join('')}</fieldset>
+  <button class="btn">${t('save')}</button><p class="msg" id="m3"></p></form></details>
+  <h2 class="sp">${t('ppl')} (${P.length})</h2>`
+  +P.map(x=>`<div class="pr"><span>${esc(x.first_name)} ${esc(x.last_name)}<br><small class="mut">${esc(x.households?.name||'')}${x.phone?', '+esc(x.phone):''}</small></span></div>`).join('');
+  const hid=$('#hid');hid.onchange=()=>{$('#nh').style.display=hid.value==='new'?'':'none'};
+  $('#pf').onsubmit=addPerson;
+}
+async function addPerson(e){
+  e.preventDefault();
+  const f=e.target,v=n=>f.elements[n].value.trim(),c=n=>f.elements[n].checked,o=$('#m3');
+  try{
+    let hid=f.elements.hid.value;
+    if(hid==='new'){
+      const {data,error}=await sb.from('households').insert({name:v('hn')||v('last'),address:v('adr')||null,city:v('city')||null}).select('id').single();
+      if(error)throw error;hid=data.id;
+    }
+    const {data:p,error:e1}=await sb.from('people').insert({household_id:hid,first_name:v('first'),last_name:v('last'),phone:v('phone')||null,email:v('email')||null,
+      share_address:c('share_address'),share_phone:c('share_phone'),share_email:c('share_email'),share_birthday:c('share_birthday')}).select('id').single();
+    if(e1)throw e1;
+    const {error:e2}=await sb.from('people_private').insert({person_id:p.id,dob:v('dob')||null,marital_status:v('mar')||null});
+    if(e2)throw e2;
+    const ids=[...f.querySelectorAll('[name=gr]:checked')].map(x=>x.value);
+    if(ids.length){const {error:e3}=await sb.from('memberships').insert(ids.map(group_id=>({group_id,person_id:p.id})));if(e3)throw e3}
+    viewPpl();
+  }catch(err){o.textContent=t('err')+err.message}
+}
+
+boot();
+</script>
+</body>
+</html>
