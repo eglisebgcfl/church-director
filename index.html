@@ -64,6 +64,8 @@ details form{padding:.75rem 0}
 .fam,.card{break-inside:avoid}
 .lf{padding:.5rem 0 1rem;border-bottom:1px solid var(--ln)}
 .acts{display:flex;gap:.35rem}
+.pcard{margin:.75rem 0}
+a{color:var(--pri)}
 table{width:100%;border-collapse:collapse}
 th,td{padding:.45rem .5rem;border-bottom:1px solid var(--ln);text-align:left}
 th{font-weight:600;color:var(--mut)}
@@ -111,7 +113,22 @@ membersonly:['Réservé aux membres de l’église','For church members only'],
 rep:['Rapports','Reports'],allg:['Tous les groupes','All groups'],from:['Du','From'],to:['Au','To'],sess:['Réunions','Meetings'],
 avgp:['Présents (moyenne)','Average present'],rate:['Taux de présence','Attendance rate'],member:['Membre','Member'],grp:['Groupe','Group'],
 rnote:['Taux = (présents + en retard) / total marqué.','Rate = (present + late) / total marked.'],
-nodata:['Aucune présence enregistrée pour cette période.','No attendance recorded for this period.'],csv:['Exporter (Excel)','Export (Excel)']
+nodata:['Aucune présence enregistrée pour cette période.','No attendance recorded for this period.'],csv:['Exporter (Excel)','Export (Excel)'],
+sub:['Soumissions','Submissions'],approve:['Approuver','Approve'],reject:['Rejeter','Reject'],pending:['En attente','Pending'],
+changed:['Modifiée','Changed'],nosubs:['Aucune soumission en attente.','No pending submissions.'],
+share:['Partager le lien','Share the link'],sharenote:['Lien pour les membres (aucune connexion nécessaire) :','Link for members (no login needed):'],
+sharemsg:['Remplissez vos informations pour l’annuaire de l’église :','Fill in your information for the church directory:'],
+back:['Retour','Back'],edit:['Modifier','Edit'],
+pubtitle:['Fiche d’inscription','Registration form'],
+pubintro:['Remplissez vos informations et celles de votre famille. Aucun compte n’est nécessaire. Seuls le prénom et le nom sont obligatoires ; les détails ne sont demandés que si vous répondez Oui.','Fill in your information and your family’s. No account is needed. Only first and last name are required; details are only asked when you answer Yes.'],
+you:['Vous','You'],fmem:['Membre de la famille','Family member'],addm:['Ajouter un membre de la famille','Add a family member'],
+remove:['Retirer','Remove'],send:['Envoyer','Submit'],famaddr:['Adresse de la famille','Family address'],
+thanks:['Merci ! Votre fiche a été envoyée à l’administration.','Thank you! Your form was sent to the administration.'],
+keeplink:['Gardez ce lien privé : il vous permet de modifier vos informations plus tard.','Keep this link private: it lets you edit your information later.'],
+copy:['Copier le lien','Copy the link'],
+editnote:['Vous modifiez votre fiche. Vos changements seront vérifiés par l’administration.','You are editing your form. Your changes will be reviewed by the administration.'],
+notfound:['Lien introuvable.','Link not found.'],myform:['Modifier ma fiche','Edit my form'],
+staff:['Accès responsables','Staff login'],memberlink:['Je suis membre : remplir ma fiche','I am a member: fill in my form']
 };
 const HT={email:'Imèl',pw:'Modpas',login:'Konekte',out:'Dekonekte',att:'Prezans',dir:'Anyè',ppl:'Manm',date:'Dat',
 leg:'P = prezan, R = an reta, A = absan',rest:'Make rès yo prezan',save:'Anrejistre',saved:'Prezans anrejistre.',
@@ -122,7 +139,15 @@ sh:'Montre nan anyè a',bd:'Fèt (jou/mwa)',gr:'Gwoup',print:'Enprime / PDF',err
 single:'Selibatè',married:'Marye',separated:'Separe',divorced:'Divòse',widowed:'Vèv / Vèf',photo:'Foto',fams:'Fanmi',inds:'Endividyèl',sharep:'Montre foto sa a nan anyè a?',leave:'Depa',lstat:'Rezon',moved:'Li demenaje',leftc:'Li kite legliz la',
 unresp:'Li pa reponn ankò',ldate:'Dat li pati',lloc:'Nouvo kote (vil / peyi)',lnote:'Nòt',former:'Ansyen manm',react:'Reaktive',cancel:'Anile',membersonly:'Pou manm legliz la sèlman',rep:'Rapò',allg:'Tout gwoup yo',from:'Soti',to:'Rive',sess:'Reyinyon',
 avgp:'Mwayèn prezan',rate:'Pousantaj prezans',member:'Manm',grp:'Gwoup',rnote:'Pousantaj = (prezan + an reta) / total make.',
-nodata:'Pa gen prezans anrejistre pou peryòd sa a.',csv:'Ekspòte (Excel)'};
+nodata:'Pa gen prezans anrejistre pou peryòd sa a.',csv:'Ekspòte (Excel)',
+sub:'Soumisyon',approve:'Apwouve',reject:'Rejte',pending:'An atant',changed:'Modifye',nosubs:'Pa gen soumisyon an atant.',
+share:'Pataje lyen an',sharenote:'Lyen pou manm yo (pa bezwen konekte):',sharemsg:'Ranpli enfòmasyon ou pou anyè legliz la:',
+back:'Retounen',edit:'Modifye',pubtitle:'Fich enskripsyon',
+pubintro:'Ranpli enfòmasyon ou ak sa fanmi ou yo. Pa bezwen kont. Se sèlman prenom ak non ki obligatwa; yo mande detay yo sèlman si ou reponn Wi.',
+you:'Ou menm',fmem:'Manm fanmi',addm:'Ajoute yon manm fanmi',remove:'Retire',send:'Voye',famaddr:'Adrès fanmi an',
+thanks:'Mèsi! Fich ou an voye bay administrasyon an.',keeplink:'Kenbe lyen sa a prive: li pèmèt ou modifye enfòmasyon ou pita.',
+copy:'Kopye lyen an',editnote:'Ou ap modifye fich ou. Administrasyon an pral verifye chanjman ou yo.',
+notfound:'Lyen an pa jwenn.',myform:'Modifye fich mwen',staff:'Aksè responsab',memberlink:'Mwen se yon manm: ranpli fich mwen'};
 const TR=Object.fromEntries([
 ['Informations personnelles','Personal information','Enfòmasyon pèsonèl'],
 ['Informations familiales','Family information','Enfòmasyon sou fanmi'],
@@ -196,7 +221,16 @@ const TR=Object.fromEntries([
 ['Famille','Family','Fanmi'],['Ami(e)','Friend','Zanmi'],['Réseaux sociaux','Social media','Rezo sosyal'],
 ['Site Web','Website','Sit wèb'],['Événement spécial','Special event','Evènman espesyal'],
 ['Visiteur','Visitor','Vizitè'],['Nouveau participant','New attendee','Nouvo patisipan'],
-['Membre','Member','Manm'],['Membre actif','Active member','Manm aktif']
+['Membre','Member','Manm'],['Membre actif','Active member','Manm aktif'],
+['Moi-même','Myself','Mwen menm'],['Type de membre','Member type','Kalite manm'],
+['Nouveau membre','New member','Nouvo manm'],['Membre existant','Existing member','Manm ki deja egziste'],['Membre qui revient','Returning member','Manm k ap retounen'],
+['Avez-vous accepté Jésus-Christ comme Seigneur et Sauveur ?','Have you accepted Jesus Christ as Lord and Savior?','Eske ou te aksepte Jezi Kris kòm Granmèt ak Sovè ou?'],
+['Quand ? (âge, année ou période)','When? (age, year or period)','Kilè? (laj, ane oswa peryòd)'],
+['Où ?','Where?','Ki kote?'],['Date exacte','Exact date','Dat egzat'],
+['À propos de votre venue','About your visit and affiliation','Sou vizit ou ak afilyasyon ou'],
+['Réservé à l’administration','Administration only','Rezève pou administrasyon'],
+['Annuaire','Directory','Anyè'],
+['Je certifie que les renseignements sont exacts et j’autorise l’église à les conserver pour les besoins administratifs, pastoraux et de communication.','I certify that the information is accurate and authorize the church to keep it for administrative, pastoral and communication purposes.','Mwen sètifye enfòmasyon yo kòrèk epi mwen otorize legliz la kenbe yo pou bezwen administratif, pastoral ak kominikasyon.']
 ].map(([a,...b])=>[a,b]));
 const tr=x=>{const e=TR[x];return lang==='fr'||!e?x:e[lang==='en'?0:1]};
 function tx(root){if(lang==='fr')return;const i=lang==='en'?0:1;
@@ -215,13 +249,13 @@ function setLang(l){lang=l;localStorage.setItem('lang',l);render()}
 function setFs(d){fs=Math.min(24,Math.max(13,fs+d));localStorage.setItem('fs',fs);document.documentElement.style.fontSize=fs+'px'}
 const tools=extra=>`<span class="tools">${[['fr','FR','Français'],['en','EN','English'],['ht','KR','Kreyòl']].map(([c,l,n])=>`<button onclick="setLang('${c}')" title="${n}"${c===lang?' style="font-weight:700;text-decoration:underline"':''}>${l}</button>`).join('')}<button onclick="setFs(-1)" aria-label="A-">A−</button><button onclick="setFs(1)" aria-label="A+">A+</button>${extra||''}</span>`;
 
-function render(){document.documentElement.lang=lang;document.documentElement.style.fontSize=fs+'px';prof?shell():loginView()}
+function render(){document.documentElement.lang=lang;document.documentElement.style.fontSize=fs+'px';if(PUB){pubView();return}prof?shell():loginView()}
 
 function loginView(msg){
   $('#app').innerHTML=`<main class="login">${tools()}<img class="lgl" src="${LOGO}" alt=""><h1>${esc(CHURCH)}</h1>
   <form id="lf"><label>${t('email')}<input type="email" id="em" required autocomplete="username"></label>
   <label>${t('pw')}<input type="password" id="pw" required autocomplete="current-password"></label>
-  <p class="msg" id="lm">${msg||''}</p><button class="btn">${t('login')}</button></form></main>`;
+  <p class="msg" id="lm">${msg||''}</p><button class="btn">${t('login')}</button></form><p class="leg"><a href="#join" onclick="pubGo();return false">${t('memberlink')}</a></p></main>`;
   $('#lf').onsubmit=async e=>{e.preventDefault();
     const {error}=await sb.auth.signInWithPassword({email:$('#em').value.trim(),password:$('#pw').value});
     if(error)return $('#lm').textContent=t('bad');
@@ -237,10 +271,10 @@ async function boot(){
 }
 
 function shell(){
-  const tabs=['att','rep','dir'].concat(prof.role==='admin'?['ppl']:[]);
+  const tabs=['att','rep','dir'].concat(prof.role==='admin'?['sub','ppl']:[]);
   $('#app').innerHTML=`<header><span class="brand"><img class="lg" src="${LOGO}" alt=""><h1>${esc(CHURCH)}</h1></span>${tools(`<button onclick="logout()">${t('out')}</button>`)}</header>
   <nav>${tabs.map(k=>`<button class="${tab===k?'on':''}" onclick="go('${k}')">${t(k)}</button>`).join('')}</nav><main id="main"></main>`;
-  ({att:viewAtt,rep:viewRep,dir:viewDir,ppl:viewPpl})[tab]();
+  ({att:viewAtt,rep:viewRep,dir:viewDir,sub:viewSub,ppl:viewPpl})[tab]();
 }
 function go(k){tab=k;shell()}
 async function logout(){await sb.auth.signOut();prof=null;render()}
@@ -377,11 +411,14 @@ async function viewDir(){
   m.innerHTML=`<div class="prt"><img src="${LOGO}" alt=""><br><strong>${esc(CHURCH)}</strong><br>${today()}, ${t('membersonly')}</div><div class="row noprint"><button class="btn${dmode==='fam'?'':' alt'}" onclick="dmode='fam';viewDir()">${t('fams')}</button><button class="btn${dmode==='ind'?'':' alt'}" onclick="dmode='ind';viewDir()">${t('inds')}</button><button class="btn alt" onclick="window.print()">${t('print')}</button></div>`+body;
 }
 
-/* ---------- People (admin) ---------- */
+/* ---------- Form definition ---------- */
 const MIN=['Louange et Adoration','École du Dimanche','Ministère des Enfants','Jeunesse','Accueil','Technique / Multimédia','Évangélisation','Intercession','Service Communautaire','Administration','Autre'];
 const SPEC=[
 ['Informations spirituelles',[
-['christ','Quand avez-vous accepté Jésus-Christ comme Seigneur et Sauveur ?','text'],
+['christ_yn','Avez-vous accepté Jésus-Christ comme Seigneur et Sauveur ?','yn'],
+['christ_when','Quand ? (âge, année ou période)','text',null,'a_christ_yn=Oui'],
+['christ_where','Où ?','text',null,'a_christ_yn=Oui'],
+['christ_date','Date exacte','date',null,'a_christ_yn=Oui'],
 ['baptized','Avez-vous été baptisé(e) ?','yn'],
 ['bapt_where','Si oui, quand et où ?','text',null,'a_baptized=Oui'],
 ['other_church','Avez-vous fréquenté une autre église auparavant ?','yn'],
@@ -410,105 +447,236 @@ const SPEC=[
 ['em_name','Nom du contact d’urgence','text'],
 ['em_rel','Lien avec vous','text'],
 ['em_phone','Téléphone du contact d’urgence','text']]],
-['Informations administratives',[
+['À propos de votre venue',[
 ['source','Comment avez-vous connu notre église ?','sel',['Famille','Ami(e)','Réseaux sociaux','Site Web','Événement spécial','Autre']],
-['source_other','Si autre, précisez','text'],
+['source_other','Si autre, précisez','text',null,'a_source=Autre'],
 ['visited','Quand avez-vous visité notre église pour la première fois ?','date'],
 ['affiliated_yn','Êtes-vous déjà affilié(e) (membre officiel) à notre église ?','yn'],
 ['affiliated','Si oui, à quelle date ?','date',null,'a_affiliated_yn=Oui'],
-['reg_date','Date d’inscription','date'],
+['reg_date','Date d’inscription','date']]]
+];
+const ASPEC=[['Réservé à l’administration',[
 ['received','Date de réception','date'],
 ['status','Statut','sel',['Visiteur','Nouveau participant','Membre','Membre actif']],
-['pastoral_notes','Commentaires pastoraux','area']]]
-];
-const fld0=([k,l,ty,o])=>{const n='a_'+k;
+['pastoral_notes','Commentaires pastoraux','area']]]];
+const fld0=([k,l,ty,o],pre)=>{const n=pre+k;
   if(ty==='yn'||ty==='sel')return `<label>${l}<select name="${n}"><option value="">—</option>${(ty==='yn'?['Oui','Non']:o).map(x=>`<option>${x}</option>`).join('')}</select></label>`;
   if(ty==='chk')return `<fieldset><legend>${l}</legend>${o.map(x=>`<label class="chk"><input type="checkbox" name="${n}" value="${x}"> ${x}</label>`).join('')}</fieldset>`;
   if(ty==='area')return `<label>${l}<textarea name="${n}" rows="2"></textarea></label>`;
   return `<label>${l}<input name="${n}" type="${ty==='date'?'date':'text'}"></label>`};
-const fld=a=>a[4]?`<div data-dep="${a[4]}" style="display:none">${fld0(a)}</div>`:fld0(a);
-const sec=(ti,body,o,id)=>`<details class="sec"${o?' open':''}${id?` id="${id}"`:''}><summary>${ti}</summary><div>${body}</div></details>`;
-function addKid(){$('#kids').insertAdjacentHTML('beforeend','<div class="row kid"><input name="kf" placeholder="Prénom de l’enfant"><input name="kd" type="date" aria-label="Date de naissance"><select name="ks"><option value="">Sexe</option><option value="M">Masculin</option><option value="F">Féminin</option></select></div>');tx($('#kids').lastElementChild)}
+const fld=(a,pre)=>a[4]?`<div data-dep="${a[4]}" style="display:none">${fld0(a,pre)}</div>`:fld0(a,pre);
+const sec=(ti,body,o,id,cls)=>`<details class="sec${cls?' '+cls:''}"${o?' open':''}${id?` id="${id}"`:''}><summary>${ti}</summary><div>${body}</div></details>`;
+const CONSENT='Je certifie que les renseignements sont exacts et j’autorise l’église à les conserver pour les besoins administratifs, pastoraux et de communication.';
 
+function formHTML(c){
+  const adm=!!c.adm,pub=!!c.pub;
+  const hh=adm?`<label>${t('hh')}<select name="hid"><option value="new">${t('nh')}</option>${(c.H||[]).map(x=>`<option value="${x.id}">${esc(x.name)}</option>`).join('')}</select></label>
+  <label id="hnw">${t('hn')}<input name="hn"></label>
+  <p class="leg">Les membres d’une même famille partagent la même adresse. Choisissez une famille existante pour ajouter un conjoint ou un enfant.</p>
+  <div class="row"><input name="adr" placeholder="${t('adr')}"><input name="city" placeholder="${t('city')}"></div>`:'';
+  const personal=`<div class="row"><input name="first" placeholder="${t('first')}" required><input name="last" placeholder="${t('last')}" required></div>
+  <label>Nom préféré (surnom)<input name="pref"></label>
+  <label>Rôle dans la famille<select name="role"><option value="">—</option><option value="self">Moi-même</option><option value="husband">Époux (mari)</option><option value="wife">Épouse (femme)</option><option value="child">Enfant</option><option value="other">Autre</option></select></label>
+  <label>Type de membre<select name="mtype"><option value="">—</option><option>Nouveau membre</option><option>Membre existant</option><option>Membre qui revient</option></select></label>
+  <div class="row"><label>${t('dob')}<input name="dob" type="date"></label><label>Sexe<select name="sex"><option value="">—</option><option value="M">Masculin</option><option value="F">Féminin</option></select></label></div>
+  <div class="adult"><label>${t('mar')}<select name="mar"><option value="">${t('none')}</option>${['single','married','separated','divorced','widowed'].map(k=>`<option value="${k}">${t(k)}</option>`).join('')}</select></label>
+  <div id="sp" class="row" style="display:none"><label>Nom du conjoint / de la conjointe<input name="spouse"></label><label>Date de mariage<input name="mdate" type="date"></label></div></div>
+  ${hh}
+  <div class="row"><input name="phone" type="tel" placeholder="${t('phone')}"><input name="email" type="email" placeholder="${t('email')}"></div>
+  <label>Profession / occupation<input name="job"></label>
+  <label>${t('photo')}<input name="photo" type="file" accept="image/*"${pub?' onchange="pubPhoto(this)"':''}> <small class="mut" data-pm></small></label>`;
+  const last=`<fieldset><legend>${t('sh')}</legend>${[['share_address','adr'],['share_phone','phone'],['share_email','email'],['share_birthday','bd'],['share_photo','photo']].map(([n,k])=>`<label class="chk"><input type="checkbox" name="${n}"> ${t(k)}</label>`).join('')}</fieldset>`
+  +(adm?`<fieldset><legend>${t('gr')}</legend>${(c.G||[]).map(x=>`<label class="chk"><input type="checkbox" name="gr" value="${x.id}"> ${gname(x)}</label>`).join('')}</fieldset>
+  <label class="chk"><input type="checkbox" name="consent"> ${CONSENT} (fiche signée reçue).</label>`:'');
+  return sec('Informations personnelles',personal,1)
+   +SPEC.map(([ti,fs])=>sec(ti,fs.map(a=>fld(a,'a_')).join(''),0,'','adult')).join('')
+   +(adm?ASPEC.map(([ti,fs])=>sec(ti,fs.map(a=>fld(a,'b_')).join(''),0,'','adult')).join(''):'')
+   +sec(adm?'Annuaire, groupes et consentement':'Annuaire',last,0,'sc');
+}
+function sync(f){
+  const E=f.elements,kid=E.role.value==='child';
+  f.querySelectorAll('.adult').forEach(d=>{d.style.display=kid?'none':''});
+  const sp=f.querySelector('#sp');if(sp)sp.style.display=E.mar.value==='married'?'':'none';
+  const hn=f.querySelector('#hnw');if(hn&&E.hid)hn.style.display=E.hid.value==='new'?'':'none';
+  f.querySelectorAll('[data-dep]').forEach(d=>{const [n,v]=d.dataset.dep.split('=');const el=E[n],show=!kid&&!!el&&el.value===v;
+    d.style.display=show?'':'none';d.querySelectorAll('input,select,textarea').forEach(x=>{x.required=show})});
+}
+function fill(f,o){Object.entries(o).forEach(([k,v])=>{if(v==null)return;const els=[...f.querySelectorAll(`[name="${k}"]`)];if(!els.length||els[0].type==='file')return;
+  if(els[0].type==='checkbox'){if(Array.isArray(v))els.forEach(x=>{x.checked=v.includes(x.value)});else els[0].checked=!!v}
+  else els[0].value=v})}
+function serialize(f){const v={};
+  [...f.elements].forEach(el=>{
+    if(!el.name||el.type==='file'||el.type==='button'||el.type==='submit')return;
+    for(let n=el;n&&n!==f;n=n.parentElement)if(n.style&&n.style.display==='none')return;
+    if(el.type==='checkbox'){if(el.hasAttribute('value')){(v[el.name]??=[]);if(el.checked)v[el.name].push(el.value)}else v[el.name]=el.checked}
+    else v[el.name]=el.value.trim()});
+  return v}
+const A=(v,pre)=>{const o={};Object.entries(v).forEach(([k,x])=>{if(k.startsWith(pre)){const y=Array.isArray(x)?(x.length?x:''):x;if(y)o[k.slice(2)]=y}});return o};
+async function store(v,o){
+  const pick=(x,l)=>l.includes(x)?x:null;
+  const pr={household_id:o.hid,household_role:pick(v.role,['self','husband','wife','child','other']),first_name:v.first,last_name:v.last,phone:v.phone||null,email:v.email||null,
+    share_address:!!v.share_address,share_phone:!!v.share_phone,share_email:!!v.share_email,share_birthday:!!v.share_birthday,share_photo:!!v.share_photo};
+  if(/^pending\/[0-9a-f-]{36}\.jpg$/.test(v.photo_path||''))pr.photo_path=v.photo_path;
+  let pid=o.id;
+  if(pid){const {error}=await sb.from('people').update(pr).eq('id',pid);if(error)throw error}
+  else{const {data,error}=await sb.from('people').insert(pr).select('id').single();if(error)throw error;pid=data.id}
+  const ans=Object.assign(A(v,'a_'),o.full?A(v,'b_'):{});if(v.mtype)ans.member_type=v.mtype;
+  const {error:e2}=await sb.from('people_private').upsert({person_id:pid,dob:v.dob||null,marital_status:pick(v.mar,['single','married','separated','divorced','widowed']),
+    sex:pick(v.sex,['M','F']),preferred_name:v.pref||null,occupation:v.job||null,spouse_name:v.spouse||null,marriage_date:v.mdate||null,answers:ans,consent_at:today()},{onConflict:'person_id'});
+  if(e2)throw e2;
+  if(o.full){
+    await sb.from('memberships').delete().eq('person_id',pid);
+    const ids=v.gr||[];if(ids.length){const {error}=await sb.from('memberships').insert(ids.map(group_id=>({group_id,person_id:pid})));if(error)throw error}
+  }
+  return pid;
+}
+
+/* ---------- Admin: members list and edit form ---------- */
+function shareLink(){const u=location.origin+location.pathname+'#join';
+  if(navigator.share)navigator.share({title:CHURCH,text:t('sharemsg'),url:u}).catch(()=>{});
+  else{if(navigator.clipboard)navigator.clipboard.writeText(u);window.open('https://wa.me/?text='+encodeURIComponent(t('sharemsg')+' '+u),'_blank')}}
 async function viewPpl(){
   const m=$('#main');
-  const [h,g,p]=await Promise.all([
-    sb.from('households').select('id,name').order('name'),
-    sb.from('groups').select('id,name_fr,name_en,name_ht').eq('active',true).order('name_fr'),
-    sb.from('people').select('id,first_name,last_name,phone,photo_path,active,households(name),people_private(left_status,left_date,left_location)').order('last_name')]);
-  const H=h.data||[],G=g.data||[],P=p.data||[],u=await urls(P.map(x=>x.photo_path));
+  const {data:p}=await sb.from('people').select('id,first_name,last_name,phone,photo_path,active,households(name),people_private(left_status,left_date,left_location)').order('last_name');
+  const P=p||[],u=await urls(P.map(x=>x.photo_path));
   const act=P.filter(x=>x.active),gone=P.filter(x=>!x.active);
   const lp=x=>{const v=x.people_private;return (Array.isArray(v)?v[0]:v)||{}};
   const LK={moved:'moved',left:'leftc',unresponsive:'unresp'};
-  const personal=`<div class="row"><input name="first" placeholder="${t('first')}" required><input name="last" placeholder="${t('last')}" required></div>
-  <label>Nom préféré (surnom)<input name="pref"></label>
-  <div class="row"><label>${t('dob')}<input name="dob" type="date"></label><label>Sexe<select name="sex"><option value="">—</option><option value="M">Masculin</option><option value="F">Féminin</option></select></label></div>
-  <label>${t('mar')}<select name="mar" id="mar"><option value="">${t('none')}</option>${['single','married','separated','divorced','widowed'].map(k=>`<option value="${k}">${t(k)}</option>`).join('')}</select></label>
-  <div id="sp" class="row" style="display:none"><label>Nom du conjoint / de la conjointe<input name="spouse"></label><label>Date de mariage<input name="mdate" type="date"></label></div>
-  <label>Rôle dans la famille<select name="role"><option value="">—</option><option value="husband">Époux (mari)</option><option value="wife">Épouse (femme)</option><option value="child">Enfant</option><option value="other">Autre</option></select></label>
-  <label>${t('hh')}<select name="hid" id="hid"><option value="new">${t('nh')}</option>${H.map(x=>`<option value="${x.id}">${esc(x.name)}</option>`).join('')}</select></label>
-  <p class="leg">Les membres d’une même famille partagent la même adresse. Choisissez une famille existante pour ajouter un conjoint ou un enfant.</p>
-  <div id="nh" class="row"><input name="hn" placeholder="${t('hn')}"><input name="adr" placeholder="${t('adr')}"><input name="city" placeholder="${t('city')}"></div>
-  <div class="row"><input name="phone" type="tel" placeholder="${t('phone')}"><input name="email" type="email" placeholder="${t('email')}"></div>
-  <label>Profession / occupation<input name="job"></label>
-  <label>${t('photo')}<input name="photo" type="file" accept="image/*"></label>`;
-  const last=`<fieldset><legend>${t('sh')}</legend>${[['share_address','adr'],['share_phone','phone'],['share_email','email'],['share_birthday','bd'],['share_photo','photo']].map(([n,k])=>`<label class="chk"><input type="checkbox" name="${n}"> ${t(k)}</label>`).join('')}</fieldset>
-  <fieldset><legend>${t('gr')}</legend>${G.map(x=>`<label class="chk"><input type="checkbox" name="gr" value="${x.id}"> ${gname(x)}</label>`).join('')}</fieldset>
-  <label class="chk"><input type="checkbox" name="consent"> Je certifie que les renseignements sont exacts et j’autorise l’église à les conserver pour les besoins administratifs, pastoraux et de communication (fiche signée reçue).</label>`;
-  m.innerHTML=`<details><summary class="btn">${t('add')}</summary><form id="pf">`
-  +sec('Informations personnelles',personal,1)
-  +sec('Informations familiales','<div id="kids"></div><button type="button" class="btn alt" onclick="addKid()">Ajouter un enfant</button>')
-  +SPEC.map(([ti,fs])=>sec(ti,fs.map(fld).join(''))).join('')
-  +sec('Annuaire, groupes et consentement',last,0,'sc')
-  +`<button class="btn">${t('save')}</button><p class="msg" id="m3"></p></form></details>
-  <h2 class="sp">${t('ppl')} (${act.length})</h2>`
-  +act.map(x=>`<div id="w${x.id}"><div class="pr"><span class="mb">${av(x,u)}<span>${esc(x.first_name)} ${esc(x.last_name)}<br><small class="mut">${esc(x.households?.name||'')}${x.phone?', '+esc(x.phone):''}</small></span></span><span class="acts"><label class="btn alt sm">${t('photo')}<input type="file" accept="image/*" hidden onchange="setPhoto('${x.id}',this.files[0])"></label><button class="btn alt sm" onclick="leaveForm('${x.id}')">${t('leave')}</button></span></div></div>`).join('')
+  m.innerHTML=`<div class="row"><button class="btn" onclick="openForm(null)">${t('add')}</button><button class="btn alt" onclick="shareLink()">${t('share')}</button></div>
+  <p class="leg">${t('sharenote')} ${esc(location.origin+location.pathname+'#join')}</p><h2 class="sp">${t('ppl')} (${act.length})</h2>`
+  +act.map(x=>`<div id="w${x.id}"><div class="pr"><span class="mb">${av(x,u)}<span>${esc(x.first_name)} ${esc(x.last_name)}<br><small class="mut">${esc(x.households?.name||'')}${x.phone?', '+esc(x.phone):''}</small></span></span><span class="acts"><label class="btn alt sm">${t('photo')}<input type="file" accept="image/*" hidden onchange="setPhoto('${x.id}',this.files[0])"></label><button class="btn alt sm" onclick="openForm('${x.id}')">${t('edit')}</button><button class="btn alt sm" onclick="leaveForm('${x.id}')">${t('leave')}</button></span></div></div>`).join('')
   +(gone.length?`<h2 class="sp">${t('former')} (${gone.length})</h2>`+gone.map(x=>{const l=lp(x);
     const info=[l.left_status?t(LK[l.left_status]):'',l.left_date,l.left_location].filter(Boolean).map(esc).join(', ');
     return `<div class="pr"><span class="mb">${av(x,u)}<span>${esc(x.first_name)} ${esc(x.last_name)}<br><small class="mut">${info}</small></span></span><button class="btn alt sm" onclick="reactivate('${x.id}')">${t('react')}</button></div>`}).join(''):'');
-  const hid=$('#hid');hid.onchange=()=>{$('#nh').style.display=hid.value==='new'?'':'none'};
-  tx($('#pf'));
-  const mar=$('#mar');mar.onchange=()=>{$('#sp').style.display=mar.value==='married'?'':'none'};
-  $('#pf').addEventListener('change',()=>{document.querySelectorAll('#pf [data-dep]').forEach(d=>{const [n,v]=d.dataset.dep.split('=');const el=$('#pf').elements[n];d.style.display=el&&el.value===v?'':'none'})});
-  $('#pf').onsubmit=addPerson;
 }
-async function addPerson(e){
+async function openForm(id){
+  const m=$('#main');
+  const [h,g]=await Promise.all([sb.from('households').select('id,name').order('name'),sb.from('groups').select('id,name_fr,name_en,name_ht').eq('active',true).order('name_fr')]);
+  m.innerHTML=`<p><button class="btn alt sm" onclick="viewPpl()">${t('back')}</button></p><form id="pf" data-id="${id||''}">${formHTML({adm:true,H:h.data||[],G:g.data||[]})}<button class="btn">${t('save')}</button><p class="msg" id="m3"></p></form>`;
+  const f=$('#pf');
+  if(id){
+    const [r1,r2,r3]=await Promise.all([sb.from('people').select('*,households(address,city)').eq('id',id).single(),
+      sb.from('people_private').select('*').eq('person_id',id).maybeSingle(),sb.from('memberships').select('group_id').eq('person_id',id)]);
+    const p=r1.data,pv=r2.data||{},ans=pv.answers||{},hs=p.households||{};
+    const o={first:p.first_name,last:p.last_name,pref:pv.preferred_name,dob:pv.dob,sex:pv.sex,mar:pv.marital_status,spouse:pv.spouse_name,mdate:pv.marriage_date,job:pv.occupation,
+      phone:p.phone,email:p.email,role:p.household_role,hid:p.household_id||'new',adr:hs.address,city:hs.city,share_address:p.share_address,share_phone:p.share_phone,
+      share_email:p.share_email,share_birthday:p.share_birthday,share_photo:p.share_photo,consent:!!pv.consent_at,gr:(r3.data||[]).map(x=>x.group_id),mtype:ans.member_type};
+    Object.entries(ans).forEach(([k,x])=>{o['a_'+k]=x;o['b_'+k]=x});
+    fill(f,o);
+  }
+  tx(f);f.addEventListener('change',()=>sync(f));f.onsubmit=savePerson;sync(f);
+}
+async function savePerson(e){
   e.preventDefault();
-  const f=e.target,v=n=>f.elements[n].value.trim(),c=n=>f.elements[n].checked,o=$('#m3');
-  if(!c('consent')){$('#sc').open=true;o.textContent=tr('Cochez le consentement avant d’enregistrer.');return}
-  const ans={};
-  SPEC.forEach(([,fs])=>fs.forEach(([k,,ty])=>{
-    const els=[...f.querySelectorAll(`[name="a_${k}"]`)];
-    const w=els[0]&&els[0].closest('[data-dep]');if(w&&w.style.display==='none')return;
-    const val=ty==='chk'?els.filter(x=>x.checked).map(x=>x.value):(els[0]?.value||'').trim();
-    if(ty==='chk'?val.length:val)ans[k]=val}));
+  const f=e.target,o=$('#m3'),v=serialize(f),id=f.dataset.id||null;
+  if(!v.consent){const sc=$('#sc');if(sc)sc.open=true;o.textContent=tr('Cochez le consentement avant d’enregistrer.');return}
   try{
-    let hid=f.elements.hid.value;
-    if(hid==='new'){
-      const {data,error}=await sb.from('households').insert({name:v('hn')||v('last'),address:v('adr')||null,city:v('city')||null}).select('id').single();
-      if(error)throw error;hid=data.id;
-    }
-    const {data:p,error:e1}=await sb.from('people').insert({household_id:hid,household_role:v('role')||null,first_name:v('first'),last_name:v('last'),phone:v('phone')||null,email:v('email')||null,
-      share_address:c('share_address'),share_phone:c('share_phone'),share_email:c('share_email'),share_birthday:c('share_birthday'),share_photo:c('share_photo')}).select('id').single();
-    if(e1)throw e1;
-    const {error:e2}=await sb.from('people_private').insert({person_id:p.id,dob:v('dob')||null,marital_status:v('mar')||null,sex:v('sex')||null,preferred_name:v('pref')||null,
-      occupation:v('job')||null,spouse_name:v('spouse')||null,marriage_date:v('mdate')||null,answers:ans,consent_at:today()});
-    if(e2)throw e2;
-    const ph=f.elements.photo.files[0];if(ph)await upPhoto(p.id,ph);
-    const ids=[...f.querySelectorAll('[name=gr]:checked')].map(x=>x.value);
-    if(ids.length){const {error:e3}=await sb.from('memberships').insert(ids.map(group_id=>({group_id,person_id:p.id})));if(e3)throw e3}
-    const kids=[...f.querySelectorAll('.kid')].map(r=>({f:r.querySelector('[name=kf]').value.trim(),d:r.querySelector('[name=kd]').value,s:r.querySelector('[name=ks]').value})).filter(k=>k.f);
-    if(kids.length){
-      const {data:ks,error:e4}=await sb.from('people').insert(kids.map(k=>({household_id:hid,first_name:k.f,last_name:v('last'),household_role:'child'}))).select('id');
-      if(e4)throw e4;
-      const {error:e5}=await sb.from('people_private').insert(ks.map((r,i)=>({person_id:r.id,dob:kids[i].d||null,sex:kids[i].s||null})));
-      if(e5)throw e5;
-    }
+    let hid=v.hid;const H={address:v.adr||null,city:v.city||null};
+    if(!hid||hid==='new'){const {data,error}=await sb.from('households').insert(Object.assign({name:v.hn||v.last},H)).select('id').single();if(error)throw error;hid=data.id}
+    else if(H.address||H.city){const {error}=await sb.from('households').update(H).eq('id',hid);if(error)throw error}
+    const pid=await store(v,{hid,id,full:true});
+    const ph=f.elements.photo.files[0];if(ph)await upPhoto(pid,ph);
     viewPpl();
   }catch(err){o.textContent=t('err')+err.message}
 }
 
-boot();
+/* ---------- Admin: forms sent through the public link ---------- */
+async function viewSub(){
+  const m=$('#main');
+  const {data,error}=await sb.from('submissions').select('token,payload,status,updated_at').in('status',['pending','changed']).order('updated_at');
+  if(error)return m.innerHTML=`<p>${t('err')}${esc(error.message)}</p>`;
+  const L=data||[];
+  m.innerHTML=`<p class="leg">${t('sharenote')} ${esc(location.origin+location.pathname+'#join')}</p><div class="row"><button class="btn alt" onclick="shareLink()">${t('share')}</button></div><h2 class="sp">${t('sub')} (${L.length})</h2>`
+  +(L.length?L.map(s=>{const P=s.payload.people||[],me=P.find(x=>x.role==='self')||P[0]||{};
+    return `<div class="fam"><p><strong>${esc(me.last||'')}</strong> <span class="mut">(${t(s.status==='pending'?'pending':'changed')}, ${esc(String(s.updated_at).slice(0,10))})</span></p>
+    <p class="mut">${P.map(x=>esc((x.first||'')+' '+(x.last||''))).join(', ')}</p>
+    <div class="acts"><button class="btn sm" onclick="approve('${s.token}')">${t('approve')}</button><button class="btn alt sm" onclick="rejectSub('${s.token}')">${t('reject')}</button></div></div>`}).join(''):`<p>${t('nosubs')}</p>`);
+}
+async function approve(tok){
+  try{
+    const {data:s,error}=await sb.from('submissions').select('*').eq('token',tok).single();if(error)throw error;
+    const P=s.payload,pm=s.pmap||{},H={address:P.adr||null,city:P.city||null},L=P.people||[];
+    let hid=s.household_id;
+    if(hid){const {error:e1}=await sb.from('households').update(H).eq('id',hid);if(e1)throw e1}
+    else{const me=L.find(x=>x.role==='self')||L[0]||{};const {data,error:e1}=await sb.from('households').insert(Object.assign({name:me.last||'—'},H)).select('id').single();if(e1)throw e1;hid=data.id}
+    for(const v of L){pm[v.k]=await store(v,{hid,id:pm[v.k]||null})}
+    const {error:e2}=await sb.from('submissions').update({status:'approved',household_id:hid,pmap:pm,updated_at:new Date().toISOString()}).eq('token',tok);if(e2)throw e2;
+    viewSub();
+  }catch(err){alert(t('err')+err.message)}
+}
+async function rejectSub(tok){await sb.from('submissions').update({status:'rejected'}).eq('token',tok);viewSub()}
+
+/* ---------- Public form: no login needed ---------- */
+let PUB=false,PTOK=null,pubView=()=>{};
+function pubGo(){history.replaceState(null,'','#join');pubStart()}
+function pubStart(){PUB=true;const h=location.hash;if(h.startsWith('#edit='))loadEdit(h.slice(6));else{PTOK=null;pubView=()=>pubForm(pubSnapshot());pubForm(null)}}
+function pubShell(){$('#app').innerHTML=`<header><span class="brand"><img class="lg" src="${LOGO}" alt=""><h1>${esc(CHURCH)}</h1></span>${tools(`<button onclick="location.href=location.pathname">${t('staff')}</button>`)}</header><main id="main"></main>`}
+function pubSnapshot(){if(!$('#cards'))return null;
+  return {adr:$('#fadr').value,city:$('#fcity').value,consent:$('#pc').checked,
+    people:[...document.querySelectorAll('.pcard')].map(c=>Object.assign(serialize(c.querySelector('form')),{k:c.dataset.k},c.dataset.photo?{photo_path:c.dataset.photo}:{}))}}
+function pubForm(S){
+  pubShell();
+  const tk=localStorage.getItem('ftok');
+  $('#main').innerHTML=`<h2>${t('pubtitle')}</h2><p class="leg">${PTOK?t('editnote'):t('pubintro')}</p>
+  ${!PTOK&&tk?`<p><a href="#edit=${esc(tk)}" onclick="loadEdit('${esc(tk)}');return false">${t('myform')}</a></p>`:''}
+  <div class="sec"><div><strong>${t('famaddr')}</strong><div class="row"><input id="fadr" placeholder="${t('adr')}"><input id="fcity" placeholder="${t('city')}"></div></div></div>
+  <div id="cards"></div>
+  <div class="row"><button type="button" class="btn alt" onclick="addCard()">${t('addm')}</button></div>
+  <input id="hp" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px">
+  <label class="chk"><input type="checkbox" id="pc"> ${CONSENT}</label>
+  <p class="msg" id="pm"></p><button class="btn" id="pb" onclick="pubSend()">${t('send')}</button>`;
+  const d=S||{people:[{role:'self'}]};
+  $('#fadr').value=d.adr||'';$('#fcity').value=d.city||'';
+  (d.people&&d.people.length?d.people:[{role:'self'}]).forEach(v=>addCard(v));
+  $('#pc').checked=!!d.consent;tx($('#main'));
+}
+function addCard(v){
+  v=v||{};const n=document.querySelectorAll('.pcard').length;
+  const box=document.createElement('div');box.className='pcard';box.dataset.k=v.k||Math.random().toString(36).slice(2,10);if(v.photo_path)box.dataset.photo=v.photo_path;
+  box.innerHTML=`<details class="sec" open><summary>${n?t('fmem'):t('you')}</summary><div><form class="pf" onsubmit="return false">${formHTML({pub:true})}</form>${n?`<p><button type="button" class="btn alt sm" onclick="this.closest('.pcard').remove()">${t('remove')}</button></p>`:''}</div></details>`;
+  $('#cards').appendChild(box);
+  const f=box.querySelector('form');
+  if(!n&&!v.role)v.role='self';
+  fill(f,v);tx(f);f.addEventListener('change',()=>sync(f));sync(f);
+  if(v.photo_path){const pm=f.querySelector('[data-pm]');if(pm)pm.textContent='✓'}
+}
+async function pubPhoto(el){
+  const file=el.files[0],box=el.closest('.pcard'),pm=el.parentElement.querySelector('[data-pm]');if(!file)return;
+  try{const blob=await shrink(file),path='pending/'+crypto.randomUUID()+'.jpg';
+    const {error}=await sb.storage.from('photos').upload(path,blob,{contentType:'image/jpeg'});if(error)throw error;
+    box.dataset.photo=path;pm.textContent='✓'}
+  catch(err){pm.textContent=t('err')+err.message}
+}
+async function pubSend(){
+  const fs=[...document.querySelectorAll('.pcard form')],o=$('#pm');
+  for(const f of fs){
+    f.querySelectorAll(':invalid').forEach(x=>{for(let d=x.closest('details');d;d=d.parentElement&&d.parentElement.closest('details'))d.open=true});
+    if(!f.reportValidity())return;
+  }
+  if(!$('#pc').checked){o.textContent=tr('Cochez le consentement avant d’enregistrer.');return}
+  if($('#hp').value)return;
+  const snap=pubSnapshot(),p={adr:snap.adr.trim(),city:snap.city.trim(),people:snap.people};
+  const b=$('#pb');b.disabled=true;
+  const {data,error}=PTOK?await sb.rpc('update_form',{tok:PTOK,p}):await sb.rpc('submit_form',{p});
+  b.disabled=false;
+  if(error)return o.textContent=t('err')+error.message;
+  const tok=PTOK||data;localStorage.setItem('ftok',tok);pubDone(tok);
+}
+function pubDone(tok){
+  pubShell();const url=location.origin+location.pathname+'#edit='+tok;
+  $('#main').innerHTML=`<h2>${t('thanks')}</h2><p>${t('keeplink')}</p><p class="mut" style="word-break:break-all">${esc(url)}</p><div class="row"><button class="btn" id="cp">${t('copy')}</button></div>`;
+  $('#cp').onclick=()=>{if(navigator.clipboard)navigator.clipboard.writeText(url);$('#cp').textContent='✓'};
+  pubView=()=>pubDone(tok);
+}
+async function loadEdit(tok){
+  PUB=true;pubShell();$('#main').innerHTML='<p>…</p>';
+  const {data,error}=await sb.rpc('get_form',{tok});
+  if(error||!data){$('#main').innerHTML=`<p>${t('notfound')}</p>`;return}
+  PTOK=tok;pubView=()=>pubForm(pubSnapshot());
+  const P=data.payload;pubForm({adr:P.adr,city:P.city,people:P.people,consent:true});
+}
+
+if(/^#(join|edit=)/.test(location.hash))pubStart();else boot();
 </script>
 </body>
 </html>
