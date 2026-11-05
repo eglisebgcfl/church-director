@@ -65,6 +65,12 @@ details form{padding:.75rem 0}
 .lf{padding:.5rem 0 1rem;border-bottom:1px solid var(--ln)}
 .acts{display:flex;gap:.35rem}
 .pcard{margin:.75rem 0}
+.pills{display:flex;gap:.4rem;flex-wrap:wrap;max-width:46rem;margin:0 auto;padding:.75rem 1rem 0}
+.pills:empty{display:none}
+.tabs{display:flex;gap:.25rem;overflow-x:auto;border-bottom:1px solid var(--ln);margin:.5rem 0}
+.tb{background:none;border:0;border-bottom:3px solid transparent;padding:.55rem .75rem;font:inherit;color:var(--mut);cursor:pointer;white-space:nowrap}
+.tb.on{color:var(--ink);border-color:var(--acc);font-weight:600}
+.pane.off{display:none}
 a{color:var(--pri)}
 table{width:100%;border-collapse:collapse}
 th,td{padding:.45rem .5rem;border-bottom:1px solid var(--ln);text-align:left}
@@ -76,7 +82,7 @@ th{font-weight:600;color:var(--mut)}
 .sum div{flex:1;min-width:8rem;border:1px solid var(--ln);border-radius:6px;padding:.6rem;background:var(--card)}
 .sum b{display:block;font-size:1.5rem;font-family:Georgia,"Times New Roman",serif}
 :focus-visible{outline:3px solid var(--acc);outline-offset:2px}
-@media print{header,nav,.noprint{display:none!important}body{background:#fff;color:#000}.prt{display:block!important;text-align:center;margin-bottom:1rem}.prt img{height:5rem}}
+@media print{header,nav,#subnav,.noprint{display:none!important}body{background:#fff;color:#000}.prt{display:block!important;text-align:center;margin-bottom:1rem}.prt img{height:5rem}}
 </style>
 <link rel="icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAASFBMVEX////8////9vX59/n05Onsx876mpuwj7C2YX+ZQGosOJEsOJAmPZglOZUqOJLSIzWdKFGHLF1xLmphMXNJNIA4NYkpNY8lMo6ElsyGAAAEF0lEQVR42u1X2bajOAwk4IXga7wn//+nUyVIgm+2nteZ1slpaGSVdsl3GP7Sf4h0MFqNuvumtNlIj8MTY56NeXzWszb40B0ycwghkvA8HhYBKMQJtf8XOoKaj+q1CTFXt3rS2koChuogjBofNkC8M3OEeIXw6lcSQVyJwfR+zGZQQfO0RKCLR6wUdbVsVBtRSphVHwkVzAx52NZFz4RM8VYyJJtrrfINEC6GPsqI5Czh72wzofoF4pCB963WtngPtAaPco8wMu4GdvT6G+Qrz9ODWuVf51suMKI8I5jeAC36S1l9zZDNKSXYXyHtS3ZE6OIwMgbHLyoUkYfCWlNMmYRnpUk1L6tPc1cR4xC6EpmTX7zItxwz9ZNyjgmIvsKLNZrfZdk54Fb4T3loxy+xElMCViQCA1vDr4o6AtIBl90CeWjPkLX2nASiAKGt+PlfJhwrUIcVAaAi6KZcmBmngFc4BAQ4geSE8V1LmkwDllZqFONDBMBg8UxiEbBfmHCIaEDJQkdpMBgAQSxAZaCVmJHNBKTyHYCOTGFz8CDN2gb08QaANzoBE5rLKPJ3PhjkcMkLCiBHRHqCZNgAYIOYUMWHNao3AMhBgweIwHnax8IOQBMQVvEPQdCvAebKHiRAylYdumNDQEURAKWQzFcAhPA+ofQRYK0AyO8A2gGAIdzbZDT/GoBVQL33QaXnwI+7Cx8AUEe+CkCiCZLGLWdnycIWxE8Aa8YkZPfFG8AonpxmthbT6JaPADQxV2lFFqAA4GFsQC2X0lpZPwNIKVfpHeZeAORN+rHAvy8A9AGdz96JmwXTWRYUOxr+w4NvAGJCln5OuwUpymACB79vADCh+Vw5TrK4MJ23RkIvOg4bAKTPAC0jmRiJBSACkGUaYCAxwt8BxAmHocy8CQBHY+FYLnTgO8Ai0xcRKw8XsKgc5Hf+NwAgQB2XW7UAKFwwFfu53NgvAGS73QEW7pXVY6vSggxjPBeVv3GT5gWk2weoFaMfAMu6QGnzV1rQrt5ht7k7ExbwAnIYbGOo2qJsHgA4xZ6oVQ0ahmDP+wfPo0vOVh+qwWS0i7K2Xa/XixBeFquV0lZbpcBaDqxLsXriuL+PnGhvaw4g1PFTz3qbisrenhtnadburJO9OTGX6RGOaYLGSd3Mm+ydcxLO6bBW92yY9Dxk1fwM8ExW5ruK9vQMEGAzbieWQeDTvloFU+FlwaSfatXUc2xg1CSU9xfd65m0/am88eBOADZjs6NMyv6UsKf9cnFb7i7XC/Sc9hOMNvJREMZRFhr4V7c0mMpok3OsiZ02PXCt8fgFXxwWtUnr7aikHxxOxlcAokZOXG4F2+IQ2uWZcCF89fmZrnWY4/kFYQye/4jiML4kE9T4Z/TushPU3z/C/k/0D/tEaa3ui1koAAAAAElFTkSuQmCC">
 <meta name="theme-color" content="#2e3a8c">
@@ -128,7 +134,19 @@ keeplink:['Gardez ce lien privé : il vous permet de modifier vos informations p
 copy:['Copier le lien','Copy the link'],
 editnote:['Vous modifiez votre fiche. Vos changements seront vérifiés par l’administration.','You are editing your form. Your changes will be reviewed by the administration.'],
 notfound:['Lien introuvable.','Link not found.'],myform:['Modifier ma fiche','Edit my form'],
-staff:['Accès responsables','Staff login'],memberlink:['Je suis membre : remplir ma fiche','I am a member: fill in my form']
+staff:['Accès responsables','Staff login'],memberlink:['Je suis membre : remplir ma fiche','I am a member: fill in my form'],
+mem:['Membres','Members'],min:['Ministères','Ministries'],cal:['Calendrier','Calendar'],list:['Liste','List'],
+addmin:['Ajouter un ministère','Add a ministry'],evtitle:['Titre','Title'],start:['Début','Start'],end:['Fin','End'],loc:['Lieu','Location'],
+whole:['Toute l’église','Whole church'],minist:['Ministère','Ministry'],addev:['Ajouter un événement','Add an event'],
+noev:['Aucun événement ce mois-ci.','No events this month.'],del:['Supprimer','Delete'],leaders:['Responsables','Leaders'],
+addleader:['Ajouter un responsable','Add a leader'],
+staffnote:['Créer l’accès d’un responsable (son compte doit exister dans Supabase)','Create a leader’s access (their login must exist in Supabase)'],
+addmem:['Ajouter un membre à ce ministère','Add a member to this ministry'],
+prev:['Précédent','Previous'],next:['Suivant','Next'],
+laterbtn:['Enregistrer et continuer plus tard','Save and continue later'],later:['Brouillon enregistré','Draft saved'],
+laterhow:['Vos réponses sont gardées sur cet appareil. Vous pouvez fermer cette page et revenir plus tard avec le même lien pour continuer.','Your answers are kept on this device. You can close this page and come back later with the same link to continue.'],
+cont:['Continuer','Continue'],draftrest:['Votre brouillon a été restauré.','Your draft was restored.'],restart:['Recommencer','Start over'],
+draftnote:['Brouillon enregistré automatiquement sur cet appareil.','Draft saved automatically on this device.']
 };
 const HT={email:'Imèl',pw:'Modpas',login:'Konekte',out:'Dekonekte',att:'Prezans',dir:'Anyè',ppl:'Manm',date:'Dat',
 leg:'P = prezan, R = an reta, A = absan',rest:'Make rès yo prezan',save:'Anrejistre',saved:'Prezans anrejistre.',
@@ -147,7 +165,13 @@ pubintro:'Ranpli enfòmasyon ou ak sa fanmi ou yo. Pa bezwen kont. Se sèlman pr
 you:'Ou menm',fmem:'Manm fanmi',addm:'Ajoute yon manm fanmi',remove:'Retire',send:'Voye',famaddr:'Adrès fanmi an',
 thanks:'Mèsi! Fich ou an voye bay administrasyon an.',keeplink:'Kenbe lyen sa a prive: li pèmèt ou modifye enfòmasyon ou pita.',
 copy:'Kopye lyen an',editnote:'Ou ap modifye fich ou. Administrasyon an pral verifye chanjman ou yo.',
-notfound:'Lyen an pa jwenn.',myform:'Modifye fich mwen',staff:'Aksè responsab',memberlink:'Mwen se yon manm: ranpli fich mwen'};
+notfound:'Lyen an pa jwenn.',myform:'Modifye fich mwen',staff:'Aksè responsab',memberlink:'Mwen se yon manm: ranpli fich mwen',
+mem:'Manm',min:'Minis',cal:'Kalandriye',list:'Lis',addmin:'Ajoute yon minis',evtitle:'Tit',start:'Kòmansman',end:'Fen',loc:'Kote',
+whole:'Tout legliz la',minist:'Minis',addev:'Ajoute yon evènman',noev:'Pa gen evènman nan mwa sa a.',del:'Siprime',leaders:'Responsab yo',
+addleader:'Ajoute yon responsab',staffnote:'Kreye aksè yon responsab (kont lan dwe egziste nan Supabase)',addmem:'Ajoute yon manm nan minis sa a',
+prev:'Anvan',next:'Apre',laterbtn:'Anrejistre epi kontinye pita',later:'Bouyon an anrejistre',
+laterhow:'Repons ou yo rete sou aparèy sa a. Ou ka fèmen paj sa a epi retounen pita ak menm lyen an pou kontinye.',
+cont:'Kontinye',draftrest:'Bouyon ou an retabli.',restart:'Rekòmanse',draftnote:'Bouyon an anrejistre otomatikman sou aparèy sa a.'};
 const TR=Object.fromEntries([
 ['Informations personnelles','Personal information','Enfòmasyon pèsonèl'],
 ['Informations familiales','Family information','Enfòmasyon sou fanmi'],
@@ -230,7 +254,10 @@ const TR=Object.fromEntries([
 ['À propos de votre venue','About your visit and affiliation','Sou vizit ou ak afilyasyon ou'],
 ['Réservé à l’administration','Administration only','Rezève pou administrasyon'],
 ['Annuaire','Directory','Anyè'],
-['Je certifie que les renseignements sont exacts et j’autorise l’église à les conserver pour les besoins administratifs, pastoraux et de communication.','I certify that the information is accurate and authorize the church to keep it for administrative, pastoral and communication purposes.','Mwen sètifye enfòmasyon yo kòrèk epi mwen otorize legliz la kenbe yo pou bezwen administratif, pastoral ak kominikasyon.']
+['Je certifie que les renseignements sont exacts et j’autorise l’église à les conserver pour les besoins administratifs, pastoraux et de communication.','I certify that the information is accurate and authorize the church to keep it for administrative, pastoral and communication purposes.','Mwen sètifye enfòmasyon yo kòrèk epi mwen otorize legliz la kenbe yo pou bezwen administratif, pastoral ak kominikasyon.'],
+['Informations spirituelles de l’enfant','Child’s spiritual information','Enfòmasyon espirityèl timoun nan'],
+['L’enfant a-t-il accepté Jésus-Christ ?','Has the child accepted Jesus Christ?','Eske timoun nan te aksepte Jezi Kris?'],
+['L’enfant est-il déjà baptisé ?','Has the child already been baptized?','Eske timoun nan deja batize?']
 ].map(([a,...b])=>[a,b]));
 const tr=x=>{const e=TR[x];return lang==='fr'||!e?x:e[lang==='en'?0:1]};
 function tx(root){if(lang==='fr')return;const i=lang==='en'?0:1;
@@ -267,14 +294,14 @@ async function boot(){
   if(!session)return render();
   const {data}=await sb.from('profiles').select('role,full_name').eq('id',session.user.id).maybeSingle();
   if(!data){await sb.auth.signOut();prof=null;return loginView(t('nop'))}
-  prof=data;tab='att';render();
+  prof=data;tab=data.role==='admin'?'mem':'att';render();
 }
 
 function shell(){
-  const tabs=['att','rep','dir'].concat(prof.role==='admin'?['sub','ppl']:[]);
+  const tabs=['mem','min','att','cal','rep'];
   $('#app').innerHTML=`<header><span class="brand"><img class="lg" src="${LOGO}" alt=""><h1>${esc(CHURCH)}</h1></span>${tools(`<button onclick="logout()">${t('out')}</button>`)}</header>
-  <nav>${tabs.map(k=>`<button class="${tab===k?'on':''}" onclick="go('${k}')">${t(k)}</button>`).join('')}</nav><main id="main"></main>`;
-  ({att:viewAtt,rep:viewRep,dir:viewDir,sub:viewSub,ppl:viewPpl})[tab]();
+  <nav>${tabs.map(k=>`<button class="${tab===k?'on':''}" onclick="go('${k}')">${t(k)}</button>`).join('')}</nav><div id="subnav" class="pills"></div><main id="main"></main>`;
+  ({mem:viewMem,min:viewMin,att:viewAtt,cal:viewCal,rep:viewRep})[tab]();
 }
 function go(k){tab=k;shell()}
 async function logout(){await sb.auth.signOut();prof=null;render()}
@@ -459,6 +486,11 @@ const ASPEC=[['Réservé à l’administration',[
 ['received','Date de réception','date'],
 ['status','Statut','sel',['Visiteur','Nouveau participant','Membre','Membre actif']],
 ['pastoral_notes','Commentaires pastoraux','area']]]];
+const KSPEC=[['Informations spirituelles de l’enfant',[
+['christ_yn','L’enfant a-t-il accepté Jésus-Christ ?','yn'],
+['christ_date','Si oui, à quelle date ?','date',null,'k_christ_yn=Oui'],
+['baptized','L’enfant est-il déjà baptisé ?','yn'],
+['bapt_date','Si oui, à quelle date ?','date',null,'k_baptized=Oui']]]];
 const fld0=([k,l,ty,o],pre)=>{const n=pre+k;
   if(ty==='yn'||ty==='sel')return `<label>${l}<select name="${n}"><option value="">—</option>${(ty==='yn'?['Oui','Non']:o).map(x=>`<option>${x}</option>`).join('')}</select></label>`;
   if(ty==='chk')return `<fieldset><legend>${l}</legend>${o.map(x=>`<label class="chk"><input type="checkbox" name="${n}" value="${x}"> ${x}</label>`).join('')}</fieldset>`;
@@ -469,7 +501,7 @@ const sec=(ti,body,o,id,cls)=>`<details class="sec${cls?' '+cls:''}"${o?' open':
 const CONSENT='Je certifie que les renseignements sont exacts et j’autorise l’église à les conserver pour les besoins administratifs, pastoraux et de communication.';
 
 function formHTML(c){
-  const adm=!!c.adm,pub=!!c.pub;
+  const adm=!!c.adm;
   const hh=adm?`<label>${t('hh')}<select name="hid"><option value="new">${t('nh')}</option>${(c.H||[]).map(x=>`<option value="${x.id}">${esc(x.name)}</option>`).join('')}</select></label>
   <label id="hnw">${t('hn')}<input name="hn"></label>
   <p class="leg">Les membres d’une même famille partagent la même adresse. Choisissez une famille existante pour ajouter un conjoint ou un enfant.</p>
@@ -479,26 +511,38 @@ function formHTML(c){
   <label>Rôle dans la famille<select name="role"><option value="">—</option><option value="self">Moi-même</option><option value="husband">Époux (mari)</option><option value="wife">Épouse (femme)</option><option value="child">Enfant</option><option value="other">Autre</option></select></label>
   <label>Type de membre<select name="mtype"><option value="">—</option><option>Nouveau membre</option><option>Membre existant</option><option>Membre qui revient</option></select></label>
   <div class="row"><label>${t('dob')}<input name="dob" type="date"></label><label>Sexe<select name="sex"><option value="">—</option><option value="M">Masculin</option><option value="F">Féminin</option></select></label></div>
+  <div class="mb"><img class="ph" data-pv alt="" style="display:none"><label>${t('photo')}<input name="photo" type="file" accept="image/*" onchange="pPhoto(this)"> <small class="mut" data-pm></small></label></div>
   <div class="adult"><label>${t('mar')}<select name="mar"><option value="">${t('none')}</option>${['single','married','separated','divorced','widowed'].map(k=>`<option value="${k}">${t(k)}</option>`).join('')}</select></label>
   <div id="sp" class="row" style="display:none"><label>Nom du conjoint / de la conjointe<input name="spouse"></label><label>Date de mariage<input name="mdate" type="date"></label></div></div>
   ${hh}
   <div class="row"><input name="phone" type="tel" placeholder="${t('phone')}"><input name="email" type="email" placeholder="${t('email')}"></div>
-  <label>Profession / occupation<input name="job"></label>
-  <label>${t('photo')}<input name="photo" type="file" accept="image/*"${pub?' onchange="pubPhoto(this)"':''}> <small class="mut" data-pm></small></label>`;
+  <label>Profession / occupation<input name="job"></label>`;
   const last=`<fieldset><legend>${t('sh')}</legend>${[['share_address','adr'],['share_phone','phone'],['share_email','email'],['share_birthday','bd'],['share_photo','photo']].map(([n,k])=>`<label class="chk"><input type="checkbox" name="${n}"> ${t(k)}</label>`).join('')}</fieldset>`
   +(adm?`<fieldset><legend>${t('gr')}</legend>${(c.G||[]).map(x=>`<label class="chk"><input type="checkbox" name="gr" value="${x.id}"> ${gname(x)}</label>`).join('')}</fieldset>
   <label class="chk"><input type="checkbox" name="consent"> ${CONSENT} (fiche signée reçue).</label>`:'');
-  return sec('Informations personnelles',personal,1)
-   +SPEC.map(([ti,fs])=>sec(ti,fs.map(a=>fld(a,'a_')).join(''),0,'','adult')).join('')
-   +(adm?ASPEC.map(([ti,fs])=>sec(ti,fs.map(a=>fld(a,'b_')).join(''),0,'','adult')).join(''):'')
-   +sec(adm?'Annuaire, groupes et consentement':'Annuaire',last,0,'sc');
+  const PN=[['Informations personnelles',personal,'']];
+  KSPEC.forEach(([ti,fs])=>PN.push([ti,fs.map(x=>fld(x,'k_')).join(''),'kidonly']));
+  SPEC.forEach(([ti,fs])=>PN.push([ti,fs.map(x=>fld(x,'a_')).join(''),'adult']));
+  if(adm)ASPEC.forEach(([ti,fs])=>PN.push([ti,fs.map(x=>fld(x,'b_')).join(''),'adult']));
+  PN.push([adm?'Annuaire, groupes et consentement':'Annuaire',last,'']);
+  return `<div class="tabs">${PN.map(([ti,,cl],i)=>`<button type="button" class="tb ${cl}${i?'':' on'}" data-i="${i}" onclick="showPane(this.closest('form'),${i})">${ti}</button>`).join('')}</div>`
+   +PN.map(([,b,cl],i)=>`<div class="pane ${cl}${i?' off':''}" data-i="${i}">${b}</div>`).join('')
+   +`<div class="row noprint"><button type="button" class="btn alt" onclick="stepPane(this.closest('form'),-1)">${t('prev')}</button><button type="button" class="btn alt" onclick="stepPane(this.closest('form'),1)">${t('next')}</button></div>`;
 }
+function showPane(f,i){i=String(i);f.querySelectorAll('.pane').forEach(p=>p.classList.toggle('off',p.dataset.i!==i));f.querySelectorAll('.tb').forEach(b=>b.classList.toggle('on',b.dataset.i===i))}
+function stepPane(f,d){const ps=[...f.querySelectorAll('.pane')].filter(p=>p.style.display!=='none'),cur=ps.findIndex(p=>!p.classList.contains('off'));
+  showPane(f,ps[Math.max(0,Math.min(ps.length-1,cur+d))].dataset.i);f.scrollIntoView({block:'start'})}
+function lastPane(f){const ps=f.querySelectorAll('.pane');showPane(f,ps[ps.length-1].dataset.i)}
+function goInvalid(f){const x=f.querySelector(':invalid');if(x){const p=x.closest('.pane');if(p)showPane(f,p.dataset.i)}return f.reportValidity()}
+function pPhoto(el){const f=el.files[0],i=el.closest('.mb').querySelector('[data-pv]');if(!f)return;i.src=URL.createObjectURL(f);i.style.display='';if(PUB)pubPhoto(el)}
+let _dt;const later=fn=>{clearTimeout(_dt);_dt=setTimeout(fn,500)};
 function sync(f){
   const E=f.elements,kid=E.role.value==='child';
   f.querySelectorAll('.adult').forEach(d=>{d.style.display=kid?'none':''});
+  f.querySelectorAll('.kidonly').forEach(d=>{d.style.display=kid?'':'none'});
   const sp=f.querySelector('#sp');if(sp)sp.style.display=E.mar.value==='married'?'':'none';
   const hn=f.querySelector('#hnw');if(hn&&E.hid)hn.style.display=E.hid.value==='new'?'':'none';
-  f.querySelectorAll('[data-dep]').forEach(d=>{const [n,v]=d.dataset.dep.split('=');const el=E[n],show=!kid&&!!el&&el.value===v;
+  f.querySelectorAll('[data-dep]').forEach(d=>{const [n,v]=d.dataset.dep.split('='),k=!!d.closest('.kidonly'),el=E[n],show=(k?kid:!kid)&&!!el&&el.value===v;
     d.style.display=show?'':'none';d.querySelectorAll('input,select,textarea').forEach(x=>{x.required=show})});
 }
 function fill(f,o){Object.entries(o).forEach(([k,v])=>{if(v==null)return;const els=[...f.querySelectorAll(`[name="${k}"]`)];if(!els.length||els[0].type==='file')return;
@@ -520,7 +564,7 @@ async function store(v,o){
   let pid=o.id;
   if(pid){const {error}=await sb.from('people').update(pr).eq('id',pid);if(error)throw error}
   else{const {data,error}=await sb.from('people').insert(pr).select('id').single();if(error)throw error;pid=data.id}
-  const ans=Object.assign(A(v,'a_'),o.full?A(v,'b_'):{});if(v.mtype)ans.member_type=v.mtype;
+  const ans=Object.assign(A(v,'a_'),A(v,'k_'),o.full?A(v,'b_'):{});if(v.mtype)ans.member_type=v.mtype;
   const {error:e2}=await sb.from('people_private').upsert({person_id:pid,dob:v.dob||null,marital_status:pick(v.mar,['single','married','separated','divorced','widowed']),
     sex:pick(v.sex,['M','F']),preferred_name:v.pref||null,occupation:v.job||null,spouse_name:v.spouse||null,marriage_date:v.mdate||null,answers:ans,consent_at:today()},{onConflict:'person_id'});
   if(e2)throw e2;
@@ -552,7 +596,7 @@ async function viewPpl(){
 async function openForm(id){
   const m=$('#main');
   const [h,g]=await Promise.all([sb.from('households').select('id,name').order('name'),sb.from('groups').select('id,name_fr,name_en,name_ht').eq('active',true).order('name_fr')]);
-  m.innerHTML=`<p><button class="btn alt sm" onclick="viewPpl()">${t('back')}</button></p><form id="pf" data-id="${id||''}">${formHTML({adm:true,H:h.data||[],G:g.data||[]})}<button class="btn">${t('save')}</button><p class="msg" id="m3"></p></form>`;
+  m.innerHTML=`<p><button class="btn alt sm" onclick="viewPpl()">${t('back')}</button></p><form id="pf" novalidate data-id="${id||''}">${id?'':`<p class="leg" id="dn">${t('draftnote')}</p>`}${formHTML({adm:true,H:h.data||[],G:g.data||[]})}<button class="btn">${t('save')}</button><p class="msg" id="m3"></p></form>`;
   const f=$('#pf');
   if(id){
     const [r1,r2,r3]=await Promise.all([sb.from('people').select('*,households(address,city)').eq('id',id).single(),
@@ -561,21 +605,30 @@ async function openForm(id){
     const o={first:p.first_name,last:p.last_name,pref:pv.preferred_name,dob:pv.dob,sex:pv.sex,mar:pv.marital_status,spouse:pv.spouse_name,mdate:pv.marriage_date,job:pv.occupation,
       phone:p.phone,email:p.email,role:p.household_role,hid:p.household_id||'new',adr:hs.address,city:hs.city,share_address:p.share_address,share_phone:p.share_phone,
       share_email:p.share_email,share_birthday:p.share_birthday,share_photo:p.share_photo,consent:!!pv.consent_at,gr:(r3.data||[]).map(x=>x.group_id),mtype:ans.member_type};
-    Object.entries(ans).forEach(([k,x])=>{o['a_'+k]=x;o['b_'+k]=x});
+    Object.entries(ans).forEach(([k,x])=>{o['a_'+k]=x;o['b_'+k]=x;o['k_'+k]=x});
     fill(f,o);
+    const uu=await urls([p.photo_path]),pvw=f.querySelector('[data-pv]');if(pvw&&uu[p.photo_path]){pvw.src=uu[p.photo_path];pvw.style.display=''}
+  }else{
+    let d=null;try{d=JSON.parse(localStorage.getItem('adraft')||'null')}catch(e){}
+    if(d){fill(f,d);$('#dn').innerHTML=`${t('draftrest')} <a href="#" onclick="localStorage.removeItem('adraft');openForm(null);return false">${t('restart')}</a>`}
+    const auto=()=>later(()=>{try{localStorage.setItem('adraft',JSON.stringify(serialize(f)))}catch(e){}});
+    f.addEventListener('input',auto);f.addEventListener('change',auto);
   }
   tx(f);f.addEventListener('change',()=>sync(f));f.onsubmit=savePerson;sync(f);
 }
 async function savePerson(e){
   e.preventDefault();
-  const f=e.target,o=$('#m3'),v=serialize(f),id=f.dataset.id||null;
-  if(!v.consent){const sc=$('#sc');if(sc)sc.open=true;o.textContent=tr('Cochez le consentement avant d’enregistrer.');return}
+  const f=e.target,o=$('#m3'),id=f.dataset.id||null;
+  if(!goInvalid(f))return;
+  const v=serialize(f);
+  if(!v.consent){lastPane(f);o.textContent=tr('Cochez le consentement avant d’enregistrer.');return}
   try{
     let hid=v.hid;const H={address:v.adr||null,city:v.city||null};
     if(!hid||hid==='new'){const {data,error}=await sb.from('households').insert(Object.assign({name:v.hn||v.last},H)).select('id').single();if(error)throw error;hid=data.id}
     else if(H.address||H.city){const {error}=await sb.from('households').update(H).eq('id',hid);if(error)throw error}
     const pid=await store(v,{hid,id,full:true});
     const ph=f.elements.photo.files[0];if(ph)await upPhoto(pid,ph);
+    if(!id)localStorage.removeItem('adraft');
     viewPpl();
   }catch(err){o.textContent=t('err')+err.message}
 }
@@ -606,10 +659,96 @@ async function approve(tok){
 }
 async function rejectSub(tok){await sb.from('submissions').update({status:'rejected'}).eq('token',tok);viewSub()}
 
+/* ---------- Members tab: list, directory, submissions ---------- */
+let mtab='list';
+async function viewMem(){
+  const ks=prof.role==='admin'?['list','dir','sub']:['dir'];
+  if(!ks.includes(mtab))mtab=ks[0];
+  $('#subnav').innerHTML=ks.map(k=>`<button class="btn sm${mtab===k?'':' alt'}" onclick="mtab='${k}';viewMem()">${t(k)}</button>`).join('');
+  ({list:viewPpl,dir:viewDir,sub:viewSub})[mtab]();
+}
+
+/* ---------- Ministries ---------- */
+async function viewMin(){
+  const m=$('#main'),adm=prof.role==='admin';
+  const [g,ml,ld,pf]=await Promise.all([
+    sb.from('groups').select('id,name_fr,name_en,name_ht').eq('active',true).order('name_fr'),
+    pages(()=>sb.from('memberships').select('group_id').order('group_id').order('person_id')),
+    adm?sb.from('group_leaders').select('group_id,user_id'):{data:[]},
+    adm?sb.from('profiles').select('id,full_name'):{data:[]}]);
+  const cnt={},nm={},lead={};
+  ml.forEach(x=>{cnt[x.group_id]=(cnt[x.group_id]||0)+1});
+  (pf.data||[]).forEach(x=>{nm[x.id]=x.full_name});
+  (ld.data||[]).forEach(x=>{(lead[x.group_id]??=[]).push(nm[x.user_id]||'?')});
+  m.innerHTML=(adm?`<details><summary class="btn">${t('addmin')}</summary><form onsubmit="addMin(event)"><div class="row"><input name="fr" placeholder="Français" required><input name="en" placeholder="English" required><input name="ht" placeholder="Kreyòl"></div><button class="btn">${t('save')}</button><p class="msg" id="mm"></p></form></details>`:'')
+  +(g.data||[]).map(x=>`<div class="pr"><span><strong>${gname(x)}</strong><br><small class="mut">${cnt[x.id]||0} ${t('mem')}${lead[x.id]?', '+esc(lead[x.id].join(', ')):''}</small></span><button class="btn alt sm" onclick="openMin('${x.id}')">${adm?t('edit'):t('mem')}</button></div>`).join('');
+}
+async function addMin(e){e.preventDefault();const f=e.target,v=n=>f.elements[n].value.trim();
+  const {error}=await sb.from('groups').insert({name_fr:v('fr'),name_en:v('en'),name_ht:v('ht')||null});
+  if(error)return $('#mm').textContent=t('err')+error.message;viewMin()}
+async function openMin(gid){
+  const m=$('#main'),adm=prof.role==='admin';
+  const [g,mm,ld,pf,pp]=await Promise.all([
+    sb.from('groups').select('id,name_fr,name_en,name_ht').eq('id',gid).single(),
+    sb.from('memberships').select('people(id,first_name,last_name,active)').eq('group_id',gid),
+    adm?sb.from('group_leaders').select('user_id').eq('group_id',gid):{data:[]},
+    adm?sb.from('profiles').select('id,full_name').order('full_name'):{data:[]},
+    adm?sb.from('people').select('id,first_name,last_name').eq('active',true).order('last_name'):{data:[]}]);
+  const mem=(mm.data||[]).map(x=>x.people).filter(p=>p&&p.active).sort((a,b)=>(a.last_name+a.first_name).localeCompare(b.last_name+b.first_name));
+  const inG=new Set(mem.map(p=>p.id)),lids=new Set((ld.data||[]).map(x=>x.user_id));
+  const leaders=(pf.data||[]).filter(x=>lids.has(x.id));
+  m.innerHTML=`<p><button class="btn alt sm" onclick="viewMin()">${t('back')}</button></p><h2>${gname(g.data)}</h2>`
+  +(adm?`<h2 class="sp">${t('leaders')}</h2>`+leaders.map(x=>`<div class="pr"><span>${esc(x.full_name)}</span><button class="btn alt sm" onclick="rmLeader('${gid}','${x.id}')">${t('remove')}</button></div>`).join('')
+    +`<div class="row"><select id="al">${(pf.data||[]).filter(x=>!lids.has(x.id)).map(x=>`<option value="${x.id}">${esc(x.full_name)}</option>`).join('')}</select><button class="btn alt" onclick="addLeader('${gid}')">${t('addleader')}</button></div>
+    <details><summary class="btn alt">${t('staffnote')}</summary><form onsubmit="newStaff(event,'${gid}')"><div class="row"><input name="n" placeholder="${t('first')} ${t('last')}" required><input name="e" type="email" placeholder="${t('email')}" required></div><button class="btn">${t('save')}</button><p class="msg"></p></form></details>`:'')
+  +`<h2 class="sp">${t('mem')} (${mem.length})</h2>`+mem.map(p=>`<div class="pr"><span>${esc(p.first_name)} ${esc(p.last_name)}</span>${adm?`<button class="btn alt sm" onclick="rmMember('${gid}','${p.id}')">${t('remove')}</button>`:''}</div>`).join('')
+  +(adm?`<div class="row"><select id="am">${(pp.data||[]).filter(p=>!inG.has(p.id)).map(p=>`<option value="${p.id}">${esc(p.last_name)} ${esc(p.first_name)}</option>`).join('')}</select><button class="btn alt" onclick="addMember('${gid}')">${t('addmem')}</button></div>`:'');
+}
+async function addMember(g){const id=$('#am').value;if(!id)return;await sb.from('memberships').insert({group_id:g,person_id:id});openMin(g)}
+async function rmMember(g,p){await sb.from('memberships').delete().eq('group_id',g).eq('person_id',p);openMin(g)}
+async function addLeader(g){const id=$('#al').value;if(!id)return;await sb.from('group_leaders').insert({group_id:g,user_id:id});openMin(g)}
+async function rmLeader(g,u){await sb.from('group_leaders').delete().eq('group_id',g).eq('user_id',u);openMin(g)}
+async function newStaff(e,g){e.preventDefault();const f=e.target,o=f.querySelector('.msg');
+  const {error}=await sb.rpc('add_staff',{p_email:f.elements.e.value.trim(),p_name:f.elements.n.value.trim(),p_role:'leader'});
+  if(error)return o.textContent=t('err')+error.message;openMin(g)}
+
+/* ---------- Calendar of events ---------- */
+let calM=(()=>{const d=new Date();d.setDate(1);return d})();
+const ymd=d=>new Date(d-d.getTimezoneOffset()*6e4).toISOString().slice(0,10);
+const loc=()=>lang==='en'?'en':'fr';
+function calGo(n){calM=new Date(calM.getFullYear(),calM.getMonth()+n,1);viewCal()}
+async function viewCal(){
+  const m=$('#main'),adm=prof.role==='admin',y=calM.getFullYear(),mo=calM.getMonth();
+  const [ev,g]=await Promise.all([
+    sb.from('events').select('*,groups(name_fr,name_en,name_ht)').gte('event_date',ymd(new Date(y,mo,1))).lte('event_date',ymd(new Date(y,mo+1,0))).order('event_date').order('start_time'),
+    sb.from('groups').select('id,name_fr,name_en,name_ht').eq('active',true).order('name_fr')]);
+  if(ev.error)return m.innerHTML=`<p>${t('err')}${esc(ev.error.message)}</p>`;
+  const G=g.data||[],mine=new Set(G.map(x=>x.id)),L=ev.data||[];
+  const title=calM.toLocaleDateString(loc(),{month:'long',year:'numeric'});
+  const form=(adm||G.length)?`<details><summary class="btn">${t('addev')}</summary><form id="ef" onsubmit="saveEv(event)">
+   <label>${t('evtitle')}<input name="title" required></label>
+   <div class="row"><label>${t('date')}<input name="d" type="date" value="${ymd(new Date())}" required></label><label>${t('start')}<input name="s" type="time"></label><label>${t('end')}<input name="e" type="time"></label></div>
+   <label>${t('minist')}<select name="g">${adm?`<option value="">${t('whole')}</option>`:''}${G.map(x=>`<option value="${x.id}">${gname(x)}</option>`).join('')}</select></label>
+   <label>${t('loc')}<input name="l"></label><label>${t('lnote')}<input name="n"></label>
+   <button class="btn">${t('save')}</button><p class="msg" id="em"></p></form></details>`:'';
+  m.innerHTML=`<div class="prt"><img src="${LOGO}" alt=""><br><strong>${esc(CHURCH)}</strong><br>${esc(title)}</div>
+  <div class="row noprint"><button class="btn alt" onclick="calGo(-1)" aria-label="‹">‹</button><h2 style="flex:3;text-align:center;align-self:center">${esc(title)}</h2><button class="btn alt" onclick="calGo(1)" aria-label="›">›</button></div>`
+  +`<div class="noprint">${form}</div>`
+  +(L.length?L.map(x=>{const d=new Date(x.event_date+'T00:00:00'),tm=[x.start_time,x.end_time].filter(Boolean).map(v=>v.slice(0,5)).join(' - ');
+    const gn=x.groups?gname(x.groups):t('whole');
+    return `<div class="pr"><span class="mb"><span class="ph">${d.getDate()}</span><span><strong>${esc(x.title)}</strong><br><small class="mut">${esc(d.toLocaleDateString(loc(),{weekday:'long'}))}${tm?', '+esc(tm):''}${x.location?', '+esc(x.location):''}<br>${gn}${x.notes?', '+esc(x.notes):''}</small></span></span>${adm||(x.group_id&&mine.has(x.group_id))?`<button class="btn alt sm noprint" onclick="delEv('${x.id}')">${t('del')}</button>`:''}</div>`}).join(''):`<p>${t('noev')}</p>`)
+  +`<div class="row noprint"><button class="btn alt" onclick="window.print()">${t('print')}</button></div>`;
+}
+async function saveEv(e){e.preventDefault();const f=e.target,v=n=>f.elements[n].value.trim();
+  const {error}=await sb.from('events').insert({title:v('title'),event_date:v('d'),start_time:v('s')||null,end_time:v('e')||null,group_id:v('g')||null,location:v('l')||null,notes:v('n')||null});
+  if(error)return $('#em').textContent=t('err')+error.message;
+  const d=new Date(v('d')+'T00:00:00');calM=new Date(d.getFullYear(),d.getMonth(),1);viewCal()}
+async function delEv(id){if(!confirm(t('del')+' ?'))return;await sb.from('events').delete().eq('id',id);viewCal()}
+
 /* ---------- Public form: no login needed ---------- */
 let PUB=false,PTOK=null,pubView=()=>{};
 function pubGo(){history.replaceState(null,'','#join');pubStart()}
-function pubStart(){PUB=true;const h=location.hash;if(h.startsWith('#edit='))loadEdit(h.slice(6));else{PTOK=null;pubView=()=>pubForm(pubSnapshot());pubForm(null)}}
+function pubStart(){PUB=true;const h=location.hash;if(h.startsWith('#edit='))loadEdit(h.slice(6));else{PTOK=null;pubView=()=>pubForm(pubSnapshot());let d=null;try{d=JSON.parse(localStorage.getItem('fdraft')||'null')}catch(e){}if(d)d._draft=1;pubForm(d)}}
 function pubShell(){$('#app').innerHTML=`<header><span class="brand"><img class="lg" src="${LOGO}" alt=""><h1>${esc(CHURCH)}</h1></span>${tools(`<button onclick="location.href=location.pathname">${t('staff')}</button>`)}</header><main id="main"></main>`}
 function pubSnapshot(){if(!$('#cards'))return null;
   return {adr:$('#fadr').value,city:$('#fcity').value,consent:$('#pc').checked,
@@ -617,18 +756,19 @@ function pubSnapshot(){if(!$('#cards'))return null;
 function pubForm(S){
   pubShell();
   const tk=localStorage.getItem('ftok');
-  $('#main').innerHTML=`<h2>${t('pubtitle')}</h2><p class="leg">${PTOK?t('editnote'):t('pubintro')}</p>
+  $('#main').innerHTML=`<h2>${t('pubtitle')}</h2><p class="leg">${PTOK?t('editnote'):t('pubintro')}</p>${S&&S._draft?`<p class="leg">${t('draftrest')} <a href="#" onclick="pubReset();return false">${t('restart')}</a></p>`:''}
   ${!PTOK&&tk?`<p><a href="#edit=${esc(tk)}" onclick="loadEdit('${esc(tk)}');return false">${t('myform')}</a></p>`:''}
   <div class="sec"><div><strong>${t('famaddr')}</strong><div class="row"><input id="fadr" placeholder="${t('adr')}"><input id="fcity" placeholder="${t('city')}"></div></div></div>
   <div id="cards"></div>
   <div class="row"><button type="button" class="btn alt" onclick="addCard()">${t('addm')}</button></div>
   <input id="hp" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px">
   <label class="chk"><input type="checkbox" id="pc"> ${CONSENT}</label>
-  <p class="msg" id="pm"></p><button class="btn" id="pb" onclick="pubSend()">${t('send')}</button>`;
+  <p class="msg" id="pm"></p><div class="row"><button class="btn" id="pb" onclick="pubSend()">${t('send')}</button>${PTOK?'':`<button type="button" class="btn alt" onclick="pubLater()">${t('laterbtn')}</button>`}</div>`;
   const d=S||{people:[{role:'self'}]};
   $('#fadr').value=d.adr||'';$('#fcity').value=d.city||'';
   (d.people&&d.people.length?d.people:[{role:'self'}]).forEach(v=>addCard(v));
   $('#pc').checked=!!d.consent;tx($('#main'));
+  $('#main').addEventListener('input',pubAuto);$('#main').addEventListener('change',pubAuto);
 }
 function addCard(v){
   v=v||{};const n=document.querySelectorAll('.pcard').length;
@@ -650,8 +790,8 @@ async function pubPhoto(el){
 async function pubSend(){
   const fs=[...document.querySelectorAll('.pcard form')],o=$('#pm');
   for(const f of fs){
-    f.querySelectorAll(':invalid').forEach(x=>{for(let d=x.closest('details');d;d=d.parentElement&&d.parentElement.closest('details'))d.open=true});
-    if(!f.reportValidity())return;
+    const x=f.querySelector(':invalid');if(x){for(let d=x.closest('details');d;d=d.parentElement&&d.parentElement.closest('details'))d.open=true}
+    if(!goInvalid(f))return;
   }
   if(!$('#pc').checked){o.textContent=tr('Cochez le consentement avant d’enregistrer.');return}
   if($('#hp').value)return;
@@ -660,8 +800,12 @@ async function pubSend(){
   const {data,error}=PTOK?await sb.rpc('update_form',{tok:PTOK,p}):await sb.rpc('submit_form',{p});
   b.disabled=false;
   if(error)return o.textContent=t('err')+error.message;
-  const tok=PTOK||data;localStorage.setItem('ftok',tok);pubDone(tok);
+  const tok=PTOK||data;localStorage.setItem('ftok',tok);localStorage.removeItem('fdraft');pubDone(tok);
 }
+const pubAuto=()=>later(()=>{if(PTOK||!$('#cards'))return;try{localStorage.setItem('fdraft',JSON.stringify(pubSnapshot()))}catch(e){}});
+function pubReset(){localStorage.removeItem('fdraft');pubForm(null)}
+function pubLaterPage(){pubShell();$('#main').innerHTML=`<h2>${t('later')}</h2><p>${t('laterhow')}</p><div class="row"><button class="btn" onclick="pubStart()">${t('cont')}</button></div>`;pubView=pubLaterPage}
+function pubLater(){const sn=pubSnapshot();if(sn&&!PTOK){try{localStorage.setItem('fdraft',JSON.stringify(sn))}catch(e){}}pubLaterPage()}
 function pubDone(tok){
   pubShell();const url=location.origin+location.pathname+'#edit='+tok;
   $('#main').innerHTML=`<h2>${t('thanks')}</h2><p>${t('keeplink')}</p><p class="mut" style="word-break:break-all">${esc(url)}</p><div class="row"><button class="btn" id="cp">${t('copy')}</button></div>`;
