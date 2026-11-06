@@ -146,7 +146,14 @@ prev:['Précédent','Previous'],next:['Suivant','Next'],
 laterbtn:['Enregistrer et continuer plus tard','Save and continue later'],later:['Brouillon enregistré','Draft saved'],
 laterhow:['Vos réponses sont gardées sur cet appareil. Vous pouvez fermer cette page et revenir plus tard avec le même lien pour continuer.','Your answers are kept on this device. You can close this page and come back later with the same link to continue.'],
 cont:['Continuer','Continue'],draftrest:['Votre brouillon a été restauré.','Your draft was restored.'],restart:['Recommencer','Start over'],
-draftnote:['Brouillon enregistré automatiquement sur cet appareil.','Draft saved automatically on this device.']
+draftnote:['Brouillon enregistré automatiquement sur cet appareil.','Draft saved automatically on this device.'],
+gen:['Générer le rapport','Generate report'],gotoatt:['Aller à Présences','Go to Attendance'],
+inactive:['Ministères inactifs','Inactive ministries'],othercat:['Autres','Other'],
+category:['Catégorie (ex. Prière)','Category (e.g. Prayer)'],deact:['Désactiver ce ministère','Deactivate this ministry'],
+searchmem:['Rechercher un membre à ajouter (2 lettres minimum)','Search for a member to add (2 letters minimum)'],
+copym:['Copier les membres de…','Copy members from…'],copyb:['Copier','Copy'],sno:['Aucun résultat','No results'],addbtn:['Ajouter','Add'],
+nodata2:['Enregistrez d’abord les présences dans l’onglet Présences (choisissez le groupe et la date, puis cliquez sur Enregistrer).','First save attendance in the Attendance tab (choose the group and date, then click Save).'],
+copyt:['Copier le résumé','Copy summary'],copied:['Résumé copié.','Summary copied.']
 };
 const HT={email:'Imèl',pw:'Modpas',login:'Konekte',out:'Dekonekte',att:'Prezans',dir:'Anyè',ppl:'Manm',date:'Dat',
 leg:'P = prezan, R = an reta, A = absan',rest:'Make rès yo prezan',save:'Anrejistre',saved:'Prezans anrejistre.',
@@ -171,7 +178,12 @@ whole:'Tout legliz la',minist:'Minis',addev:'Ajoute yon evènman',noev:'Pa gen e
 addleader:'Ajoute yon responsab',staffnote:'Kreye aksè yon responsab (kont lan dwe egziste nan Supabase)',addmem:'Ajoute yon manm nan minis sa a',
 prev:'Anvan',next:'Apre',laterbtn:'Anrejistre epi kontinye pita',later:'Bouyon an anrejistre',
 laterhow:'Repons ou yo rete sou aparèy sa a. Ou ka fèmen paj sa a epi retounen pita ak menm lyen an pou kontinye.',
-cont:'Kontinye',draftrest:'Bouyon ou an retabli.',restart:'Rekòmanse',draftnote:'Bouyon an anrejistre otomatikman sou aparèy sa a.'};
+cont:'Kontinye',draftrest:'Bouyon ou an retabli.',restart:'Rekòmanse',draftnote:'Bouyon an anrejistre otomatikman sou aparèy sa a.',
+gen:'Jenere rapò a',gotoatt:'Ale nan Prezans',
+inactive:'Minis ki pa aktif',othercat:'Lòt',category:'Kategori (egz. Priyè)',deact:'Dezaktive minis sa a',
+searchmem:'Chèche yon manm pou ajoute (omwen 2 lèt)',copym:'Kopye manm yo soti nan…',copyb:'Kopye',sno:'Pa gen rezilta',addbtn:'Ajoute',
+nodata2:'Anrejistre prezans yo anvan nan onglè Prezans (chwazi gwoup la ak dat la, epi klike sou Anrejistre).',
+copyt:'Kopye rezime a',copied:'Rezime kopye.'};
 const TR=Object.fromEntries([
 ['Informations personnelles','Personal information','Enfòmasyon pèsonèl'],
 ['Informations familiales','Family information','Enfòmasyon sou fanmi'],
@@ -298,7 +310,7 @@ async function boot(){
 }
 
 function shell(){
-  const tabs=['mem','min','att','cal','rep'];
+  const tabs=prof.role==='admin'?['mem','min','att','cal','rep']:['min','att','cal','rep'];
   $('#app').innerHTML=`<header><span class="brand"><img class="lg" src="${LOGO}" alt=""><h1>${esc(CHURCH)}</h1></span>${tools(`<button onclick="logout()">${t('out')}</button>`)}</header>
   <nav>${tabs.map(k=>`<button class="${tab===k?'on':''}" onclick="go('${k}')">${t(k)}</button>`).join('')}</nav><div id="subnav" class="pills"></div><main id="main"></main>`;
   ({mem:viewMem,min:viewMin,att:viewAtt,cal:viewCal,rep:viewRep})[tab]();
@@ -319,8 +331,8 @@ async function viewAtt(){
 }
 async function loadAtt(){
   const g=$('#g').value,d=$('#d').value;if(!d)return;
-  const {data:mem}=await sb.from('memberships').select('people(id,first_name,last_name,active)').eq('group_id',g);
-  cur.people=(mem||[]).map(x=>x.people).filter(p=>p&&p.active).sort((a,b)=>(a.last_name+a.first_name).localeCompare(b.last_name+b.first_name));
+  const {data:mem}=await sb.rpc('group_roster',{gid:g});
+  cur.people=(mem||[]).filter(p=>p.active).sort((a,b)=>(a.last_name+a.first_name).localeCompare(b.last_name+b.first_name));
   cur.st={};
   const {data:s}=await sb.from('sessions').select('id').eq('group_id',g).eq('session_date',d).maybeSingle();
   if(s){const {data:a}=await sb.from('attendance').select('person_id,status').eq('session_id',s.id);(a||[]).forEach(r=>cur.st[r.person_id]=r.status)}
@@ -343,6 +355,15 @@ async function saveAtt(){
   o.textContent=t('saved');
 }
 
+/* ---------- Share: print / PDF, e-mail, WhatsApp ---------- */
+let SHARE={subject:'',text:''};
+const bar=csvBtn=>`<div class="row noprint"><button class="btn alt" onclick="window.print()">${t('print')}</button><button class="btn alt" onclick="shareTxt('mail')">${t('email')}</button><button class="btn alt" onclick="shareTxt('wa')">WhatsApp</button><button class="btn alt" onclick="shareTxt('copy')">${t('copyt')}</button>${csvBtn?`<button class="btn alt" onclick="csv()">${t('csv')}</button>`:''}</div>`;
+function shareTxt(k){const s=SHARE.subject,x=SHARE.text;
+  if(k==='mail')location.href='mailto:?subject='+encodeURIComponent(s)+'&body='+encodeURIComponent(x);
+  else if(k==='wa')window.open('https://wa.me/?text='+encodeURIComponent(s+'\n\n'+x),'_blank');
+  else{if(navigator.clipboard)navigator.clipboard.writeText(s+'\n\n'+x);alert(t('copied'))}}
+const gplain=g=>lang==='fr'?g.name_fr:lang==='en'?g.name_en:(g.name_ht||g.name_fr);
+
 /* ---------- Reports ---------- */
 const ago=()=>{const d=new Date();d.setMonth(d.getMonth()-3);return new Date(d-d.getTimezoneOffset()*6e4).toISOString().slice(0,10)};
 let RP={rows:[]};
@@ -357,41 +378,47 @@ async function viewRep(){
   const m=$('#main');
   const {data:gs}=await sb.from('groups').select('id,name_fr,name_en,name_ht').eq('active',true).order('name_fr');
   if(!gs||!gs.length){m.innerHTML=`<p>${t('nog')}</p>`;return}
-  m.innerHTML=`<div class="row noprint"><select id="rg"><option value="all">${t('allg')}</option>${gs.map(g=>`<option value="${g.id}">${gname(g)}</option>`).join('')}</select><label>${t('from')}<input type="date" id="rf" value="${ago()}"></label><label>${t('to')}<input type="date" id="rt" value="${today()}"></label></div><div id="rout"></div>`;
+  m.innerHTML=`<div class="row noprint"><select id="rg"><option value="all">${t('allg')}</option>${gs.map(g=>`<option value="${g.id}">${gname(g)}</option>`).join('')}</select><label>${t('from')}<input type="date" id="rf" value="${ago()}"></label><label>${t('to')}<input type="date" id="rt" value="${today()}"></label><button class="btn" onclick="runRep(RP.gs)">${t('gen')}</button></div><div id="rout"></div>`;
+  RP.gs=gs;
   ['rg','rf','rt'].forEach(i=>{$('#'+i).onchange=()=>runRep(gs)});
   runRep(gs);
 }
 async function runRep(gs){
   const g=$('#rg').value,a=$('#rf').value,b=$('#rt').value,o=$('#rout');if(!a||!b)return;
-  o.innerHTML='';
+  o.innerHTML='<p class="leg">…</p>';
   let rows;
-  try{rows=await pages(()=>{let q=sb.from('attendance').select('status,person_id,session_id,people(first_name,last_name),sessions!inner(group_id,session_date)').gte('sessions.session_date',a).lte('sessions.session_date',b).order('session_id').order('person_id');if(g!=='all')q=q.eq('sessions.group_id',g);return q})}
+  try{rows=await pages(()=>{let q=sb.from('attendance').select('status,person_id,session_id,sessions!inner(group_id,session_date)').gte('sessions.session_date',a).lte('sessions.session_date',b).order('session_id').order('person_id');if(g!=='all')q=q.eq('sessions.group_id',g);return q})}
   catch(e){o.innerHTML=`<p>${t('err')}${esc(e.message)}</p>`;return}
-  if(!rows.length){o.innerHTML=`<p>${t('nodata')}</p>`;return}
+  if(!rows.length){o.innerHTML=`<p>${t('nodata')}</p><p class="leg">${t('nodata2')}</p><div class="row"><button class="btn alt" onclick="go('att')">${t('gotoatt')}</button></div>`;return}
   const S={},tot=cnt();
   rows.forEach(r=>{const x=S[r.session_id]??={g:r.sessions.group_id,d:r.sessions.session_date,c:cnt()};x.c[r.status]++;tot[r.status]++});
   const ss=Object.values(S).sort((x,y)=>x.d.localeCompare(y.d)),present=ss.reduce((n,x)=>n+x.c.P+x.c.R,0);
   const title=g==='all'?t('allg'):gname(gs.find(x=>x.id===g));
+  const ptitle=g==='all'?t('allg'):gplain(gs.find(x=>x.id===g));
+  const hdr=`${CHURCH}\n${t('att')}: ${ptitle}\n${a} / ${b}\n${t('sess')}: ${ss.length}, ${t('avgp')}: ${(present/ss.length).toFixed(1)}, ${t('rate')}: ${pct(tot)}%\n\n`;
   let body;
   if(g==='all'){
     const G={};ss.forEach(x=>{const y=G[x.g]??={n:0,p:0,c:cnt()};y.n++;y.p+=x.c.P+x.c.R;['P','R','A'].forEach(k=>y.c[k]+=x.c[k])});
     const list=gs.filter(x=>G[x.id]).map(x=>[lang==='fr'?x.name_fr:lang==='en'?x.name_en:(x.name_ht||x.name_fr),G[x.id]]);
     RP.rows=[[t('grp'),t('sess'),t('avgp'),t('rate')]].concat(list.map(([n,y])=>[n,y.n,(y.p/y.n).toFixed(1),(pct(y.c)??'')+'%']));
+    SHARE={subject:`${CHURCH}: ${t('rep')} ${ptitle}`,text:hdr+list.map(([n,y])=>`- ${n}: ${y.n} ${t('sess')}, ${(y.p/y.n).toFixed(1)} ${t('avgp')}, ${pct(y.c)}%`).join('\n')};
     body=tb([t('grp'),t('sess'),t('avgp'),t('rate')],list.map(([n,y])=>[esc(n),y.n,(y.p/y.n).toFixed(1),pcH(pct(y.c))]));
   }else{
     const M={};
-    const {data:mem}=await sb.from('memberships').select('people(id,first_name,last_name,active)').eq('group_id',g);
-    (mem||[]).forEach(x=>{const p=x.people;if(p&&p.active)M[p.id]={f:p.first_name,l:p.last_name,c:cnt()}});
-    rows.forEach(r=>{const p=r.people||{first_name:'?',last_name:''};const y=M[r.person_id]??={f:p.first_name,l:p.last_name,c:cnt()};y.c[r.status]++});
+    const {data:mem}=await sb.rpc('group_roster',{gid:g}),NMS={};
+    (mem||[]).forEach(p=>{NMS[p.id]=p;if(p.active)M[p.id]={f:p.first_name,l:p.last_name,c:cnt()}});
+    rows.forEach(r=>{const p=NMS[r.person_id]||{first_name:'?',last_name:''};const y=M[r.person_id]??={f:p.first_name,l:p.last_name,c:cnt()};y.c[r.status]++});
     const ms=Object.values(M).sort((x,y)=>(x.l+x.f).localeCompare(y.l+y.f));
     RP.rows=[[t('member'),'P','R','A',t('rate')]].concat(ms.map(y=>[y.f+' '+y.l,y.c.P,y.c.R,y.c.A,(pct(y.c)??'')+'%']));
+    SHARE={subject:`${CHURCH}: ${t('rep')} ${ptitle}`,text:hdr+t('member')+':\n'+ms.slice(0,40).map(y=>`- ${y.f} ${y.l}: P ${y.c.P}, R ${y.c.R}, A ${y.c.A} (${pct(y.c)??'-'}%)`).join('\n')};
     body=`<h2 class="sp">${t('sess')}</h2>`+tb([t('date'),'P','R','A',t('rate')],ss.map(x=>[x.d,x.c.P,x.c.R,x.c.A,pcH(pct(x.c))]))
       +`<h2 class="sp">${t('member')}</h2>`+tb([t('member'),'P','R','A',t('rate')],ms.map(y=>[esc(y.f+' '+y.l),y.c.P,y.c.R,y.c.A,pcH(pct(y.c))]));
   }
   o.innerHTML=`<div class="prt"><img src="${LOGO}" alt=""><br><strong>${esc(CHURCH)}</strong><br>${title}, ${a} / ${b}</div>
+  ${bar(true)}
   <div class="sum"><div><b>${ss.length}</b>${t('sess')}</div><div><b>${(present/ss.length).toFixed(1)}</b>${t('avgp')}</div><div><b>${pct(tot)}%</b>${t('rate')}</div></div>
   <p class="leg">${t('rnote')} ${t('leg')}</p>`+body
-  +`<div class="row noprint"><button class="btn alt" onclick="csv()">${t('csv')}</button><button class="btn alt" onclick="window.print()">${t('print')}</button></div>`;
+  +bar(true);
 }
 
 /* ---------- Departures ---------- */
@@ -669,10 +696,12 @@ async function viewMem(){
 }
 
 /* ---------- Ministries ---------- */
+const minForm=(g,cats)=>`<div class="row"><input name="fr" placeholder="Français" required value="${esc(g?g.name_fr:'')}"><input name="en" placeholder="English" required value="${esc(g?g.name_en:'')}"><input name="ht" placeholder="Kreyòl" value="${esc(g&&g.name_ht||'')}"></div>
+  <label>${t('category')}<input name="cat" list="cats" value="${esc(g&&g.category||'')}"></label><datalist id="cats">${cats.map(c=>`<option value="${esc(c)}">`).join('')}</datalist>`;
 async function viewMin(){
   const m=$('#main'),adm=prof.role==='admin';
   const [g,ml,ld,pf]=await Promise.all([
-    sb.from('groups').select('id,name_fr,name_en,name_ht').eq('active',true).order('name_fr'),
+    sb.from('groups').select('id,name_fr,name_en,name_ht,category,active').order('name_fr'),
     pages(()=>sb.from('memberships').select('group_id').order('group_id').order('person_id')),
     adm?sb.from('group_leaders').select('group_id,user_id'):{data:[]},
     adm?sb.from('profiles').select('id,full_name'):{data:[]}]);
@@ -680,32 +709,53 @@ async function viewMin(){
   ml.forEach(x=>{cnt[x.group_id]=(cnt[x.group_id]||0)+1});
   (pf.data||[]).forEach(x=>{nm[x.id]=x.full_name});
   (ld.data||[]).forEach(x=>{(lead[x.group_id]??=[]).push(nm[x.user_id]||'?')});
-  m.innerHTML=(adm?`<details><summary class="btn">${t('addmin')}</summary><form onsubmit="addMin(event)"><div class="row"><input name="fr" placeholder="Français" required><input name="en" placeholder="English" required><input name="ht" placeholder="Kreyòl"></div><button class="btn">${t('save')}</button><p class="msg" id="mm"></p></form></details>`:'')
-  +(g.data||[]).map(x=>`<div class="pr"><span><strong>${gname(x)}</strong><br><small class="mut">${cnt[x.id]||0} ${t('mem')}${lead[x.id]?', '+esc(lead[x.id].join(', ')):''}</small></span><button class="btn alt sm" onclick="openMin('${x.id}')">${adm?t('edit'):t('mem')}</button></div>`).join('');
+  const all=g.data||[],on=all.filter(x=>x.active),off=all.filter(x=>!x.active);
+  const cats=[...new Set(all.map(x=>x.category).filter(Boolean))].sort();
+  const row=x=>`<div class="pr"><span><strong>${gname(x)}</strong><br><small class="mut">${cnt[x.id]||0} ${t('mem')}${lead[x.id]?', '+esc(lead[x.id].join(', ')):''}</small></span><button class="btn alt sm" onclick="openMin('${x.id}')">${adm?t('edit'):t('mem')}</button></div>`;
+  const by={};on.forEach(x=>{(by[x.category||'']??=[]).push(x)});
+  const keys=Object.keys(by).sort((x,y)=>(x===''?1:0)-(y===''?1:0)||x.localeCompare(y));
+  m.innerHTML=(adm?`<details><summary class="btn">${t('addmin')}</summary><form onsubmit="addMin(event)">${minForm(null,cats)}<button class="btn">${t('save')}</button><p class="msg" id="mm"></p></form></details>`:'')
+   +keys.map(k=>(k?`<h2 class="sp">${esc(k)}</h2>`:(keys.length>1?`<h2 class="sp">${t('othercat')}</h2>`:''))+by[k].map(row).join('')).join('')
+   +(adm&&off.length?`<h2 class="sp">${t('inactive')}</h2>`+off.map(x=>`<div class="pr"><span>${gname(x)}</span><button class="btn alt sm" onclick="setMinActive('${x.id}',true)">${t('react')}</button></div>`).join(''):'');
 }
 async function addMin(e){e.preventDefault();const f=e.target,v=n=>f.elements[n].value.trim();
-  const {error}=await sb.from('groups').insert({name_fr:v('fr'),name_en:v('en'),name_ht:v('ht')||null});
+  const {error}=await sb.from('groups').insert({name_fr:v('fr'),name_en:v('en'),name_ht:v('ht')||null,category:v('cat')||null});
   if(error)return $('#mm').textContent=t('err')+error.message;viewMin()}
+async function saveMin(e,gid){e.preventDefault();const f=e.target,v=n=>f.elements[n].value.trim();
+  const {error}=await sb.from('groups').update({name_fr:v('fr'),name_en:v('en'),name_ht:v('ht')||null,category:v('cat')||null}).eq('id',gid);
+  if(error)return f.querySelector('.msg').textContent=t('err')+error.message;openMin(gid)}
+async function setMinActive(gid,on){if(!on&&!confirm(t('deact')+' ?'))return;await sb.from('groups').update({active:on}).eq('id',gid);viewMin()}
+let MIN_IDS=new Set();
 async function openMin(gid){
   const m=$('#main'),adm=prof.role==='admin';
-  const [g,mm,ld,pf,pp]=await Promise.all([
-    sb.from('groups').select('id,name_fr,name_en,name_ht').eq('id',gid).single(),
-    sb.from('memberships').select('people(id,first_name,last_name,active)').eq('group_id',gid),
+  const [g,mm,ld,pf,gs]=await Promise.all([
+    sb.from('groups').select('id,name_fr,name_en,name_ht,category').eq('id',gid).single(),
+    sb.rpc('group_roster',{gid}),
     adm?sb.from('group_leaders').select('user_id').eq('group_id',gid):{data:[]},
     adm?sb.from('profiles').select('id,full_name').order('full_name'):{data:[]},
-    adm?sb.from('people').select('id,first_name,last_name').eq('active',true).order('last_name'):{data:[]}]);
-  const mem=(mm.data||[]).map(x=>x.people).filter(p=>p&&p.active).sort((a,b)=>(a.last_name+a.first_name).localeCompare(b.last_name+b.first_name));
-  const inG=new Set(mem.map(p=>p.id)),lids=new Set((ld.data||[]).map(x=>x.user_id));
-  const leaders=(pf.data||[]).filter(x=>lids.has(x.id));
+    adm?sb.from('groups').select('id,name_fr,name_en,name_ht').eq('active',true).order('name_fr'):{data:[]}]);
+  const mem=(mm.data||[]).filter(p=>p.active);
+  MIN_IDS=new Set(mem.map(p=>p.id));
+  const lids=new Set((ld.data||[]).map(x=>x.user_id)),leaders=(pf.data||[]).filter(x=>lids.has(x.id));
+  const cats=adm?[...new Set((gs.data||[]).map(x=>x.category).filter(Boolean))]:[];
   m.innerHTML=`<p><button class="btn alt sm" onclick="viewMin()">${t('back')}</button></p><h2>${gname(g.data)}</h2>`
+  +(adm?`<details><summary class="btn alt">${t('edit')} ${t('minist')}</summary><form onsubmit="saveMin(event,'${gid}')">${minForm(g.data,cats)}<div class="row"><button class="btn">${t('save')}</button><button type="button" class="btn alt" onclick="setMinActive('${gid}',false)">${t('deact')}</button></div><p class="msg"></p></form></details>`:'')
   +(adm?`<h2 class="sp">${t('leaders')}</h2>`+leaders.map(x=>`<div class="pr"><span>${esc(x.full_name)}</span><button class="btn alt sm" onclick="rmLeader('${gid}','${x.id}')">${t('remove')}</button></div>`).join('')
     +`<div class="row"><select id="al">${(pf.data||[]).filter(x=>!lids.has(x.id)).map(x=>`<option value="${x.id}">${esc(x.full_name)}</option>`).join('')}</select><button class="btn alt" onclick="addLeader('${gid}')">${t('addleader')}</button></div>
     <details><summary class="btn alt">${t('staffnote')}</summary><form onsubmit="newStaff(event,'${gid}')"><div class="row"><input name="n" placeholder="${t('first')} ${t('last')}" required><input name="e" type="email" placeholder="${t('email')}" required></div><button class="btn">${t('save')}</button><p class="msg"></p></form></details>`:'')
-  +`<h2 class="sp">${t('mem')} (${mem.length})</h2>`+mem.map(p=>`<div class="pr"><span>${esc(p.first_name)} ${esc(p.last_name)}</span>${adm?`<button class="btn alt sm" onclick="rmMember('${gid}','${p.id}')">${t('remove')}</button>`:''}</div>`).join('')
-  +(adm?`<div class="row"><select id="am">${(pp.data||[]).filter(p=>!inG.has(p.id)).map(p=>`<option value="${p.id}">${esc(p.last_name)} ${esc(p.first_name)}</option>`).join('')}</select><button class="btn alt" onclick="addMember('${gid}')">${t('addmem')}</button></div>`:'');
+  +`<h2 class="sp">${t('mem')} (${mem.length})</h2>`+mem.map(p=>`<div class="pr"><span>${esc(p.first_name)} ${esc(p.last_name)}</span><button class="btn alt sm" onclick="rmMember('${gid}','${p.id}')">${t('remove')}</button></div>`).join('')
+  +`<div class="row"><input id="sq" placeholder="${t('searchmem')}" oninput="srch('${gid}')" autocomplete="off"></div><div id="sr"></div>`
+  +(adm?`<div class="row"><select id="cs">${(gs.data||[]).filter(x=>x.id!==gid).map(x=>`<option value="${x.id}">${gname(x)}</option>`).join('')}</select><button class="btn alt" onclick="copyMembers('${gid}')">${t('copym')} ${t('copyb')}</button></div>`:'');
 }
-async function addMember(g){const id=$('#am').value;if(!id)return;await sb.from('memberships').insert({group_id:g,person_id:id});openMin(g)}
+function srch(gid){later(async()=>{const q=$('#sq').value.trim(),r=$('#sr');if(!r)return;if(q.length<2){r.innerHTML='';return}
+  const {data}=await sb.rpc('search_people',{q});const L=(data||[]).filter(p=>!MIN_IDS.has(p.id));
+  r.innerHTML=L.length?L.map(p=>`<div class="pr"><span>${esc(p.first_name)} ${esc(p.last_name)}</span><button class="btn sm" onclick="addMember('${gid}','${p.id}')">${t('addbtn')}</button></div>`).join(''):`<p class="leg">${t('sno')}</p>`},350)}
+async function addMember(g,pid){const {error}=await sb.from('memberships').insert({group_id:g,person_id:pid});if(error)return alert(t('err')+error.message);openMin(g)}
 async function rmMember(g,p){await sb.from('memberships').delete().eq('group_id',g).eq('person_id',p);openMin(g)}
+async function copyMembers(g){const src=$('#cs').value;if(!src)return;
+  const {data}=await sb.from('memberships').select('person_id').eq('group_id',src);
+  if(data&&data.length){const {error}=await sb.from('memberships').upsert(data.map(x=>({group_id:g,person_id:x.person_id})),{onConflict:'group_id,person_id',ignoreDuplicates:true});if(error)return alert(t('err')+error.message)}
+  openMin(g)}
 async function addLeader(g){const id=$('#al').value;if(!id)return;await sb.from('group_leaders').insert({group_id:g,user_id:id});openMin(g)}
 async function rmLeader(g,u){await sb.from('group_leaders').delete().eq('group_id',g).eq('user_id',u);openMin(g)}
 async function newStaff(e,g){e.preventDefault();const f=e.target,o=f.querySelector('.msg');
@@ -725,6 +775,7 @@ async function viewCal(){
   if(ev.error)return m.innerHTML=`<p>${t('err')}${esc(ev.error.message)}</p>`;
   const G=g.data||[],mine=new Set(G.map(x=>x.id)),L=ev.data||[];
   const title=calM.toLocaleDateString(loc(),{month:'long',year:'numeric'});
+  SHARE={subject:`${CHURCH}: ${t('cal')} ${title}`,text:`${CHURCH}\n${title}\n\n`+(L.length?L.map(x=>{const tm=[x.start_time,x.end_time].filter(Boolean).map(v=>v.slice(0,5)).join('-');return `- ${x.event_date.slice(8)}/${x.event_date.slice(5,7)} ${x.title}${tm?', '+tm:''}${x.location?', '+x.location:''}`}).join('\n'):t('noev'))};
   const form=(adm||G.length)?`<details><summary class="btn">${t('addev')}</summary><form id="ef" onsubmit="saveEv(event)">
    <label>${t('evtitle')}<input name="title" required></label>
    <div class="row"><label>${t('date')}<input name="d" type="date" value="${ymd(new Date())}" required></label><label>${t('start')}<input name="s" type="time"></label><label>${t('end')}<input name="e" type="time"></label></div>
@@ -733,11 +784,11 @@ async function viewCal(){
    <button class="btn">${t('save')}</button><p class="msg" id="em"></p></form></details>`:'';
   m.innerHTML=`<div class="prt"><img src="${LOGO}" alt=""><br><strong>${esc(CHURCH)}</strong><br>${esc(title)}</div>
   <div class="row noprint"><button class="btn alt" onclick="calGo(-1)" aria-label="‹">‹</button><h2 style="flex:3;text-align:center;align-self:center">${esc(title)}</h2><button class="btn alt" onclick="calGo(1)" aria-label="›">›</button></div>`
-  +`<div class="noprint">${form}</div>`
+  +`<div class="noprint">${form}</div>`+bar(false)
   +(L.length?L.map(x=>{const d=new Date(x.event_date+'T00:00:00'),tm=[x.start_time,x.end_time].filter(Boolean).map(v=>v.slice(0,5)).join(' - ');
     const gn=x.groups?gname(x.groups):t('whole');
     return `<div class="pr"><span class="mb"><span class="ph">${d.getDate()}</span><span><strong>${esc(x.title)}</strong><br><small class="mut">${esc(d.toLocaleDateString(loc(),{weekday:'long'}))}${tm?', '+esc(tm):''}${x.location?', '+esc(x.location):''}<br>${gn}${x.notes?', '+esc(x.notes):''}</small></span></span>${adm||(x.group_id&&mine.has(x.group_id))?`<button class="btn alt sm noprint" onclick="delEv('${x.id}')">${t('del')}</button>`:''}</div>`}).join(''):`<p>${t('noev')}</p>`)
-  +`<div class="row noprint"><button class="btn alt" onclick="window.print()">${t('print')}</button></div>`;
+  +bar(false);
 }
 async function saveEv(e){e.preventDefault();const f=e.target,v=n=>f.elements[n].value.trim();
   const {error}=await sb.from('events').insert({title:v('title'),event_date:v('d'),start_time:v('s')||null,end_time:v('e')||null,group_id:v('g')||null,location:v('l')||null,notes:v('n')||null});
