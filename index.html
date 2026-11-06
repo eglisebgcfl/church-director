@@ -76,6 +76,7 @@ details form{padding:.75rem 0}
 .big strong{display:block;font-size:1.05rem}
 .big small{display:block;opacity:.85}
 .srch{width:100%;margin:.5rem 0}
+.s4 div{min-width:4.5rem}
 .foot{margin-top:auto;text-align:center;color:var(--mut);font-size:.85rem;padding-top:1.5rem}
 .mc{min-height:100vh;position:relative;overflow:hidden;color:#fff;background:linear-gradient(135deg,#0e1858 0%,#1d2a82 48%,#3745c2 100%)}
 .mc::before{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(115deg,transparent 64%,rgba(255,255,255,.07) 64% 67%,transparent 67% 73%,rgba(255,255,255,.4) 73% 75%,rgba(6,12,76,.6) 75% 83%,rgba(96,116,255,.4) 83% 91%,transparent 91%)}
@@ -197,6 +198,9 @@ tagline:['Annuaire et suivi des présences','Directory and attendance tracking']
 nologin:['Aucun compte nécessaire','No account needed'],
 staffsub:['Pasteur, administrateurs et responsables de ministère','Pastor, administrators and ministry leaders'],
 est:['Fondée en 2016','Established 2016'],
+P1:['Présents','Present'],R1:['En retard','Late'],A1:['Absents','Absent'],unm:['Non marqués','Not marked'],
+savedyes:['Présences enregistrées pour cette date.','Attendance saved for this date.'],
+savedno:['Pas encore enregistré pour cette date.','Not saved yet for this date.'],
 newvis:['Nouveau visiteur','New visitor'],newvissub:['Remplir ma fiche, aucun compte nécessaire','Fill in my form, no account needed'],
 reg:['Déjà inscrit','Already registered'],regsub:['Modifier ma fiche avec mon lien privé','Update my form with my private link'],
 regnote:['Après l’envoi de votre fiche, vous avez reçu un lien privé. Collez-le ici pour modifier vos informations. Si vous l’avez perdu, demandez à l’administration de vous aider.','After sending your form you received a private link. Paste it here to update your information. If you lost it, ask the administration to help.'],
@@ -238,6 +242,7 @@ searchmem:'Chèche yon manm pou ajoute (omwen 2 lèt)',copym:'Kopye manm yo soti
 nodata2:'Anrejistre prezans yo anvan nan onglè Prezans (chwazi gwoup la ak dat la, epi klike sou Anrejistre).',
 copyt:'Kopye rezime a',copied:'Rezime kopye.',
 tagline:'Anyè ak swivi prezans',nologin:'Pa bezwen kont',staffsub:'Pastè, administratè ak responsab minis yo',est:'Fonde nan 2016',
+P1:'Prezan',R1:'An reta',A1:'Absan',unm:'Pa make',savedyes:'Prezans anrejistre pou dat sa a.',savedno:'Poko anrejistre pou dat sa a.',
 newvis:'Nouvo vizitè',newvissub:'Ranpli fich mwen, pa bezwen kont',reg:'Deja anrejistre',regsub:'Modifye fich mwen ak lyen prive mwen',
 regnote:'Apre ou fin voye fich ou, ou te resevwa yon lyen prive. Kole l isit la pou modifye enfòmasyon ou. Si ou pèdi l, mande administrasyon an pou ede ou.',
 regph:'Kole lyen prive ou a isit la',regopen:'Louvri fich mwen',home:'Paj dakèy',
@@ -400,24 +405,29 @@ async function viewAtt(){
   const {data:gs}=await sb.from('groups').select('id,name_fr,name_en,name_ht').eq('active',true).order('name_fr');
   if(!gs||!gs.length){m.innerHTML=`<p>${t('nog')}</p>`;return}
   m.innerHTML=`<div class="row"><select id="g">${gs.map(g=>`<option value="${g.id}">${gname(g)}</option>`).join('')}</select>
-  <input type="date" id="d" value="${today()}" aria-label="${t('date')}"></div>
+  <button class="btn alt sm" style="flex:none;min-width:0" onclick="shiftD(-7)" aria-label="-7">‹</button><input type="date" id="d" value="${today()}" aria-label="${t('date')}"><button class="btn alt sm" style="flex:none;min-width:0" onclick="shiftD(7)" aria-label="+7">›</button></div>
   <p class="leg">${t('leg')}</p><div id="list"></div><p class="msg" id="m2"></p>`;
   $('#g').onchange=$('#d').onchange=loadAtt;
   loadAtt();
 }
+function shiftD(n){const i=$('#d');if(!i.value)return;const d=new Date(i.value+'T00:00:00');d.setDate(d.getDate()+n);i.value=ymd(d);loadAtt()}
+function attSum(){const c={P:0,R:0,A:0};cur.people.forEach(p=>{if(cur.st[p.id])c[cur.st[p.id]]++});
+  const un=cur.people.length-c.P-c.R-c.A;
+  return `<div class="sum s4"><div><b>${c.P}</b>${t('P1')}</div><div><b>${c.R}</b>${t('R1')}</div><div><b>${c.A}</b>${t('A1')}</div><div><b>${un}</b>${t('unm')}</div></div><p class="leg">${cur.saved?t('savedyes'):t('savedno')}</p>`}
 async function loadAtt(){
   const g=$('#g').value,d=$('#d').value;if(!d)return;
   const {data:mem}=await sb.rpc('group_roster',{gid:g});
   cur.people=(mem||[]).filter(p=>p.active).sort((a,b)=>(a.last_name+a.first_name).localeCompare(b.last_name+b.first_name));
   cur.st={};
   const {data:s}=await sb.from('sessions').select('id').eq('group_id',g).eq('session_date',d).maybeSingle();
+  cur.saved=!!s;
   if(s){const {data:a}=await sb.from('attendance').select('person_id,status').eq('session_id',s.id);(a||[]).forEach(r=>cur.st[r.person_id]=r.status)}
   $('#m2').textContent='';drawAtt();
 }
 function drawAtt(){
   const l=$('#list');if(!l)return;
   if(!cur.people.length){l.innerHTML=`<p>${t('nom')}</p>`;return}
-  l.innerHTML=cur.people.map(p=>`<div class="pr"><span>${esc(p.first_name)} ${esc(p.last_name)}</span><span class="st">${['P','R','A'].map(k=>`<button class="${k}${cur.st[p.id]===k?' on':''}" onclick="mark('${p.id}','${k}')">${k}</button>`).join('')}</span></div>`).join('')
+  l.innerHTML=attSum()+cur.people.map(p=>`<div class="pr"><span>${esc(p.first_name)} ${esc(p.last_name)}</span><span class="st">${['P','R','A'].map(k=>`<button class="${k}${cur.st[p.id]===k?' on':''}" onclick="mark('${p.id}','${k}')">${k}</button>`).join('')}</span></div>`).join('')
   +`<div class="row"><button class="btn alt" onclick="restP()">${t('rest')}</button><button class="btn" onclick="saveAtt()">${t('save')}</button></div>`;
 }
 function mark(id,k){cur.st[id]=k;drawAtt()}
@@ -428,7 +438,7 @@ async function saveAtt(){
   if(e)return o.textContent=t('err')+e.message;
   const rows=cur.people.filter(p=>cur.st[p.id]).map(p=>({session_id:s.id,person_id:p.id,status:cur.st[p.id]}));
   if(rows.length){const {error}=await sb.from('attendance').upsert(rows,{onConflict:'session_id,person_id'});if(error)return o.textContent=t('err')+error.message}
-  o.textContent=t('saved');
+  o.textContent=t('saved');cur.saved=true;drawAtt();
 }
 
 /* ---------- Search a name ---------- */
