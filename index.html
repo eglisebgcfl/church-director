@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Annuaire</title>
+<title>Ministry Connect</title>
 <style>
 :root{--bg:#f5f6fa;--ink:#1c2233;--mut:#5b6479;--pri:#2e3a8c;--onpri:#fff;--acc:#e41f26;--card:#fff;--ln:#dde1ea;--ok:#2e7d4f;--wa:#b7791f;--no:#b23a3a;color-scheme:light}
 @media(prefers-color-scheme:dark){:root{--bg:#12141f;--ink:#e8eaf3;--mut:#a3a9bf;--pri:#8f9cf0;--onpri:#10132a;--acc:#ff6b70;--card:#1b1e2e;--ln:#2f3350;--ok:#5cc08a;--wa:#e0a84f;--no:#e07a7a;color-scheme:dark}}
@@ -76,6 +76,33 @@ details form{padding:.75rem 0}
 .big strong{display:block;font-size:1.05rem}
 .big small{display:block;opacity:.85}
 .foot{margin-top:auto;text-align:center;color:var(--mut);font-size:.85rem;padding-top:1.5rem}
+.mc{min-height:100vh;position:relative;overflow:hidden;color:#fff;background:linear-gradient(135deg,#0e1858 0%,#1d2a82 48%,#3745c2 100%)}
+.mc::before{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(115deg,transparent 64%,rgba(255,255,255,.07) 64% 67%,transparent 67% 73%,rgba(255,255,255,.4) 73% 75%,rgba(6,12,76,.6) 75% 83%,rgba(96,116,255,.4) 83% 91%,transparent 91%)}
+.mc::after{content:"";position:absolute;right:5%;bottom:10%;width:7.5rem;height:4.5rem;pointer-events:none;background-image:radial-gradient(circle,rgba(255,255,255,.9) 3px,transparent 4px);background-size:1.5rem 1.5rem}
+.mch{position:relative;z-index:1;max-width:64rem;margin:0 auto;padding:1rem 1rem 2rem;display:flex;flex-direction:column;min-height:100vh}
+.mch .tools{justify-content:flex-end;color:#fff}
+.mc-grid{display:grid;gap:1rem 2rem;grid-template-areas:"top" "text" "acts";margin-top:.5rem}
+.mc-top{grid-area:top}.mc-badge{grid-area:badge}.mc-text{grid-area:text}.mc-acts{grid-area:acts;max-width:30rem;margin-bottom:2rem}
+.mc-kick{font-size:1.05rem;font-weight:600;margin:.5rem 0 0}
+.mc-logo{display:block;width:min(26rem,100%);height:auto}
+.mc-text h2{font-size:1.5rem;margin:0 0 .5rem}
+.mc-desc{opacity:.92;line-height:1.6;max-width:38rem;margin:0}
+.mc-church{background:#fff;border-radius:16px;padding:.9rem;box-shadow:0 10px 30px rgba(0,0,0,.35);max-width:22rem;margin:0 auto}
+.mc-church img{display:block;width:100%;height:auto}
+.mc .big{background:rgba(255,255,255,.1);border:2px solid rgba(255,255,255,.6);color:#fff}
+.mc .big.pri{background:#e41f26;border-color:#e41f26}
+.mc-credit{margin:auto -1rem 0;padding:.9rem 1.2rem;background:#4350cf;clip-path:polygon(0 0,94% 0,90% 100%,0 100%)}
+.mc-credit small{display:block;opacity:.9}
+.mc-credit strong{font-size:1.15rem}
+.mcx{min-height:100vh;background:linear-gradient(135deg,#14206b,#2f3ca8);color:#fff}
+.mcx-in{max-width:78rem;margin:0 auto;padding:.75rem 1rem 2rem}
+.mcx .tools{justify-content:flex-end;color:#fff;margin-bottom:.5rem}
+.mcx-img{display:block;width:100%;height:auto}
+.mcx .mc-acts{margin:1.25rem auto 0;max-width:30rem}
+.mcx .big{background:rgba(255,255,255,.1);border:2px solid rgba(255,255,255,.6);color:#fff}
+.mcx .big.pri{background:#e41f26;border-color:#e41f26}
+.mc .login{background:var(--card);color:var(--ink);border-radius:16px;padding:1.2rem;margin-top:6vh;position:relative;z-index:1}
+@media(max-width:700px){.mc::after{display:none}}
 .pills{display:flex;gap:.4rem;flex-wrap:wrap;max-width:46rem;margin:0 auto;padding:.75rem 1rem 0}
 .pills:empty{display:none}
 .tabs{display:flex;gap:.25rem;overflow-x:auto;border-bottom:1px solid var(--ln);margin:.5rem 0}
@@ -168,7 +195,11 @@ copyt:['Copier le résumé','Copy summary'],copied:['Résumé copié.','Summary 
 tagline:['Annuaire et suivi des présences','Directory and attendance tracking'],
 nologin:['Aucun compte nécessaire','No account needed'],
 staffsub:['Pasteur, administrateurs et responsables de ministère','Pastor, administrators and ministry leaders'],
-est:['Fondée en 2016','Established 2016']
+est:['Fondée en 2016','Established 2016'],
+mck:['L’annuaire de la famille de l’église et des ministères','The Church Family & Ministry Directory'],
+mct:['Connecter une famille à la fois.','Connect One Family at a Time.'],
+mcd:['Ministry Connect est un lieu central pour garder notre famille d’église connectée, informée et impliquée. Il réunit les informations des membres, les présences dans les ministères, les rapports, les événements de l’église, les nouveaux membres, les anniversaires, les célébrations familiales et les photographies.','Ministry Connect is a central place to keep our church family connected, informed, and involved. It brings together member information, ministry attendance, reports, church events, new members, birthdays, family celebrations, and photographs.'],
+mcby:['Concept, conception et développement par','Concept, Design & Development by']
 };
 const HT={email:'Imèl',pw:'Modpas',login:'Konekte',out:'Dekonekte',att:'Prezans',dir:'Anyè',ppl:'Manm',date:'Dat',
 leg:'P = prezan, R = an reta, A = absan',rest:'Make rès yo prezan',save:'Anrejistre',saved:'Prezans anrejistre.',
@@ -199,7 +230,10 @@ inactive:'Minis ki pa aktif',othercat:'Lòt',category:'Kategori (egz. Priyè)',d
 searchmem:'Chèche yon manm pou ajoute (omwen 2 lèt)',copym:'Kopye manm yo soti nan…',copyb:'Kopye',sno:'Pa gen rezilta',addbtn:'Ajoute',
 nodata2:'Anrejistre prezans yo anvan nan onglè Prezans (chwazi gwoup la ak dat la, epi klike sou Anrejistre).',
 copyt:'Kopye rezime a',copied:'Rezime kopye.',
-tagline:'Anyè ak swivi prezans',nologin:'Pa bezwen kont',staffsub:'Pastè, administratè ak responsab minis yo',est:'Fonde nan 2016'};
+tagline:'Anyè ak swivi prezans',nologin:'Pa bezwen kont',staffsub:'Pastè, administratè ak responsab minis yo',est:'Fonde nan 2016',
+mck:'Anyè fanmi legliz la ak minis yo',mct:'Konekte yon fanmi alafwa.',
+mcd:'Ministry Connect se yon kote santral pou kenbe fanmi legliz nou an konekte, enfòme ak enplike. Li rasanble enfòmasyon manm yo, prezans nan minis yo, rapò, evènman legliz la, nouvo manm yo, fèt nesans, selebrasyon fanmi ak foto yo.',
+mcby:'Konsèp, konsepsyon ak devlopman pa'};
 const TR=Object.fromEntries([
 ['Informations personnelles','Personal information','Enfòmasyon pèsonèl'],
 ['Informations familiales','Family information','Enfòmasyon sou fanmi'],
@@ -310,18 +344,20 @@ let LMODE='home';
 function loginView(msg,mode){
   LMODE=mode||(msg?'login':LMODE);
   if(LMODE==='login')return loginForm(msg);
-  const ico=(d)=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
-  $('#app').innerHTML=`<main class="home">${tools()}
-  <div class="hero"><img class="lgl" src="${LOGO}" alt=""><h1>${esc(CHURCH)}</h1><p class="tag">${t('tagline')}</p></div>
-  <button class="big pri" onclick="pubGo()">${ico('<rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4h6v3H9z"/><path d="M8.5 12h7M8.5 16h5"/>')}<span><strong>${t('memberlink')}</strong><small>${t('nologin')}</small></span></button>
-  <button class="big" onclick="loginView('','login')">${ico('<rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>')}<span><strong>${t('staff')}</strong><small>${t('staffsub')}</small></span></button>
-  <p class="foot">${t('est')}</p></main>`;
+  const ico=d=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
+  $('#app').innerHTML=`<div class="mcx"><main class="mcx-in">${tools()}
+  <img class="mcx-img" src="ministry-connect.jpg" alt="Ministry Connect: ${esc(CHURCH)}" onerror="this.style.display='none';document.getElementById('mcfb').style.display='block'">
+  <h1 id="mcfb" style="display:none;text-align:center">Ministry Connect</h1>
+  <div class="mc-acts">
+    <button class="big pri" onclick="pubGo()">${ico('<rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4h6v3H9z"/><path d="M8.5 12h7M8.5 16h5"/>')}<span><strong>${t('memberlink')}</strong><small>${t('nologin')}</small></span></button>
+    <button class="big" onclick="loginView('','login')">${ico('<rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>')}<span><strong>${t('staff')}</strong><small>${t('staffsub')}</small></span></button>
+  </div></main></div>`;
 }
 function loginForm(msg){
-  $('#app').innerHTML=`<main class="login">${tools()}<img class="lgl" src="${LOGO}" alt=""><h1>${esc(CHURCH)}</h1>
+  $('#app').innerHTML=`<div class="mc"><main class="login">${tools()}<img class="lgl" src="${LOGO}" alt=""><h1>${esc(CHURCH)}</h1>
   <form id="lf"><label>${t('email')}<input type="email" id="em" required autocomplete="username"></label>
   <label>${t('pw')}<input type="password" id="pw" required autocomplete="current-password"></label>
-  <p class="msg" id="lm">${msg||''}</p><button class="btn">${t('login')}</button></form><p class="leg"><a href="#" onclick="loginView('','home');return false">${t('back')}</a></p></main>`;
+  <p class="msg" id="lm">${msg||''}</p><button class="btn">${t('login')}</button></form><p class="leg"><a href="#" onclick="loginView('','home');return false">${t('back')}</a></p></main></div>`;
   $('#lf').onsubmit=async e=>{e.preventDefault();
     const {error}=await sb.auth.signInWithPassword({email:$('#em').value.trim(),password:$('#pw').value});
     if(error)return $('#lm').textContent=t('bad');
