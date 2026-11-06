@@ -75,6 +75,7 @@ details form{padding:.75rem 0}
 .big svg{width:2.1rem;height:2.1rem;flex:none}
 .big strong{display:block;font-size:1.05rem}
 .big small{display:block;opacity:.85}
+.srch{width:100%;margin:.5rem 0}
 .foot{margin-top:auto;text-align:center;color:var(--mut);font-size:.85rem;padding-top:1.5rem}
 .mc{min-height:100vh;position:relative;overflow:hidden;color:#fff;background:linear-gradient(135deg,#0e1858 0%,#1d2a82 48%,#3745c2 100%)}
 .mc::before{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(115deg,transparent 64%,rgba(255,255,255,.07) 64% 67%,transparent 67% 73%,rgba(255,255,255,.4) 73% 75%,rgba(6,12,76,.6) 75% 83%,rgba(96,116,255,.4) 83% 91%,transparent 91%)}
@@ -196,6 +197,7 @@ tagline:['Annuaire et suivi des présences','Directory and attendance tracking']
 nologin:['Aucun compte nécessaire','No account needed'],
 staffsub:['Pasteur, administrateurs et responsables de ministère','Pastor, administrators and ministry leaders'],
 est:['Fondée en 2016','Established 2016'],
+searchname:['Rechercher un nom, téléphone ou famille…','Search a name, phone or family…'],
 mck:['L’annuaire de la famille de l’église et des ministères','The Church Family & Ministry Directory'],
 mct:['Connecter une famille à la fois.','Connect One Family at a Time.'],
 mcd:['Ministry Connect est un lieu central pour garder notre famille d’église connectée, informée et impliquée. Il réunit les informations des membres, les présences dans les ministères, les rapports, les événements de l’église, les nouveaux membres, les anniversaires, les célébrations familiales et les photographies.','Ministry Connect is a central place to keep our church family connected, informed, and involved. It brings together member information, ministry attendance, reports, church events, new members, birthdays, family celebrations, and photographs.'],
@@ -231,6 +233,7 @@ searchmem:'Chèche yon manm pou ajoute (omwen 2 lèt)',copym:'Kopye manm yo soti
 nodata2:'Anrejistre prezans yo anvan nan onglè Prezans (chwazi gwoup la ak dat la, epi klike sou Anrejistre).',
 copyt:'Kopye rezime a',copied:'Rezime kopye.',
 tagline:'Anyè ak swivi prezans',nologin:'Pa bezwen kont',staffsub:'Pastè, administratè ak responsab minis yo',est:'Fonde nan 2016',
+searchname:'Chèche yon non, telefòn oswa fanmi…',
 mck:'Anyè fanmi legliz la ak minis yo',mct:'Konekte yon fanmi alafwa.',
 mcd:'Ministry Connect se yon kote santral pou kenbe fanmi legliz nou an konekte, enfòme ak enplike. Li rasanble enfòmasyon manm yo, prezans nan minis yo, rapò, evènman legliz la, nouvo manm yo, fèt nesans, selebrasyon fanmi ak foto yo.',
 mcby:'Konsèp, konsepsyon ak devlopman pa'};
@@ -418,6 +421,12 @@ async function saveAtt(){
   o.textContent=t('saved');
 }
 
+/* ---------- Search a name ---------- */
+const nrm=x=>String(x||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
+function flt(id,sel){const q=nrm($('#'+id).value.trim());let n=0;
+  document.querySelectorAll(sel).forEach(el=>{const ok=!q||(el.dataset.s||'').includes(q);el.style.display=ok?'':'none';if(ok)n++});
+  const m=$('#fn');if(m)m.textContent=q&&!n?t('sno'):''}
+
 /* ---------- Share: print / PDF, e-mail, WhatsApp ---------- */
 let SHARE={subject:'',text:''};
 const bar=csvBtn=>`<div class="row noprint"><button class="btn alt" onclick="window.print()">${t('print')}</button><button class="btn alt" onclick="shareTxt('mail')">${t('email')}</button><button class="btn alt" onclick="shareTxt('wa')">WhatsApp</button><button class="btn alt" onclick="shareTxt('copy')">${t('copyt')}</button>${csvBtn?`<button class="btn alt" onclick="csv()">${t('csv')}</button>`:''}</div>`;
@@ -523,9 +532,9 @@ async function viewDir(){
   let body;
   if(dmode==='fam'){
     const fam={};D0.forEach(p=>{(fam[p.household_id||p.person_id]??=[]).push(p)});
-    body=Object.values(fam).map(f=>`<section class="fam"><h2>${esc(f[0].last_name)}</h2><div class="mem">${f.map(p=>`<div class="mb">${av(p,u)}<p><strong>${esc(p.first_name)}</strong>${lines(p)}</p></div>`).join('')}</div>${adr(f)?`<p class="mut">${esc(adr(f))}</p>`:''}</section>`).join('');
-  }else body='<div class="ind">'+D0.map(p=>`<div class="mb card">${av(p,u)}<p><strong>${esc(p.first_name)} ${esc(p.last_name)}</strong>${lines(p)}${adr([p])?`<br><span class="mut">${esc(adr([p]))}</span>`:''}</p></div>`).join('')+'</div>';
-  m.innerHTML=`<div class="prt"><img src="${LOGO}" alt=""><br><strong>${esc(CHURCH)}</strong><br>${today()}, ${t('membersonly')}</div><div class="row noprint"><button class="btn${dmode==='fam'?'':' alt'}" onclick="dmode='fam';viewDir()">${t('fams')}</button><button class="btn${dmode==='ind'?'':' alt'}" onclick="dmode='ind';viewDir()">${t('inds')}</button><button class="btn alt" onclick="window.print()">${t('print')}</button></div>`+body;
+    body=Object.values(fam).map(f=>`<section class="fam" data-s="${esc(nrm(f.map(p=>[p.first_name,p.last_name,p.phone,p.email].join(' ')).join(' ')))}"><h2>${esc(f[0].last_name)}</h2><div class="mem">${f.map(p=>`<div class="mb">${av(p,u)}<p><strong>${esc(p.first_name)}</strong>${lines(p)}</p></div>`).join('')}</div>${adr(f)?`<p class="mut">${esc(adr(f))}</p>`:''}</section>`).join('');
+  }else body='<div class="ind">'+D0.map(p=>`<div class="mb card" data-s="${esc(nrm([p.first_name,p.last_name,p.phone,p.email].join(' ')))}">${av(p,u)}<p><strong>${esc(p.first_name)} ${esc(p.last_name)}</strong>${lines(p)}${adr([p])?`<br><span class="mut">${esc(adr([p]))}</span>`:''}</p></div>`).join('')+'</div>';
+  m.innerHTML=`<div class="prt"><img src="${LOGO}" alt=""><br><strong>${esc(CHURCH)}</strong><br>${today()}, ${t('membersonly')}</div><div class="row noprint"><button class="btn${dmode==='fam'?'':' alt'}" onclick="dmode='fam';viewDir()">${t('fams')}</button><button class="btn${dmode==='ind'?'':' alt'}" onclick="dmode='ind';viewDir()">${t('inds')}</button><button class="btn alt" onclick="window.print()">${t('print')}</button></div><div class="noprint"><input id="dsq" type="search" class="srch" placeholder="${t('searchname')}" oninput="flt('dsq','#main [data-s]')" autocomplete="off"><p class="leg" id="fn"></p></div>`+body;
 }
 
 /* ---------- Form definition ---------- */
@@ -671,17 +680,17 @@ function shareLink(){const u=location.origin+location.pathname+'#join';
   else{if(navigator.clipboard)navigator.clipboard.writeText(u);window.open('https://wa.me/?text='+encodeURIComponent(t('sharemsg')+' '+u),'_blank')}}
 async function viewPpl(){
   const m=$('#main');
-  const {data:p}=await sb.from('people').select('id,first_name,last_name,phone,photo_path,active,households(name),people_private(left_status,left_date,left_location)').order('last_name');
+  const {data:p}=await sb.from('people').select('id,first_name,last_name,phone,email,photo_path,active,households(name),people_private(left_status,left_date,left_location)').order('last_name');
   const P=p||[],u=await urls(P.map(x=>x.photo_path));
   const act=P.filter(x=>x.active),gone=P.filter(x=>!x.active);
   const lp=x=>{const v=x.people_private;return (Array.isArray(v)?v[0]:v)||{}};
   const LK={moved:'moved',left:'leftc',unresponsive:'unresp'};
   m.innerHTML=`<div class="row"><button class="btn" onclick="openForm(null)">${t('add')}</button><button class="btn alt" onclick="shareLink()">${t('share')}</button></div>
-  <p class="leg">${t('sharenote')} ${esc(location.origin+location.pathname+'#join')}</p><h2 class="sp">${t('ppl')} (${act.length})</h2>`
-  +act.map(x=>`<div id="w${x.id}"><div class="pr"><span class="mb">${av(x,u)}<span>${esc(x.first_name)} ${esc(x.last_name)}<br><small class="mut">${esc(x.households?.name||'')}${x.phone?', '+esc(x.phone):''}</small></span></span><span class="acts"><label class="btn alt sm">${t('photo')}<input type="file" accept="image/*" hidden onchange="setPhoto('${x.id}',this.files[0])"></label><button class="btn alt sm" onclick="openForm('${x.id}')">${t('edit')}</button><button class="btn alt sm" onclick="leaveForm('${x.id}')">${t('leave')}</button></span></div></div>`).join('')
+  <p class="leg">${t('sharenote')} ${esc(location.origin+location.pathname+'#join')}</p><input id="msq" type="search" class="srch" placeholder="${t('searchname')}" oninput="flt('msq','#main [data-s]')" autocomplete="off"><p class="leg" id="fn"></p><h2 class="sp">${t('ppl')} (${act.length})</h2>`
+  +act.map(x=>`<div id="w${x.id}" data-s="${esc(nrm([x.first_name,x.last_name,x.households&&x.households.name,x.phone,x.email].join(' ')))}"><div class="pr"><span class="mb">${av(x,u)}<span>${esc(x.first_name)} ${esc(x.last_name)}<br><small class="mut">${esc(x.households?.name||'')}${x.phone?', '+esc(x.phone):''}</small></span></span><span class="acts"><label class="btn alt sm">${t('photo')}<input type="file" accept="image/*" hidden onchange="setPhoto('${x.id}',this.files[0])"></label><button class="btn alt sm" onclick="openForm('${x.id}')">${t('edit')}</button><button class="btn alt sm" onclick="leaveForm('${x.id}')">${t('leave')}</button></span></div></div>`).join('')
   +(gone.length?`<h2 class="sp">${t('former')} (${gone.length})</h2>`+gone.map(x=>{const l=lp(x);
     const info=[l.left_status?t(LK[l.left_status]):'',l.left_date,l.left_location].filter(Boolean).map(esc).join(', ');
-    return `<div class="pr"><span class="mb">${av(x,u)}<span>${esc(x.first_name)} ${esc(x.last_name)}<br><small class="mut">${info}</small></span></span><button class="btn alt sm" onclick="reactivate('${x.id}')">${t('react')}</button></div>`}).join(''):'');
+    return `<div class="pr" data-s="${esc(nrm([x.first_name,x.last_name,x.households&&x.households.name,x.phone,x.email].join(' ')))}"><span class="mb">${av(x,u)}<span>${esc(x.first_name)} ${esc(x.last_name)}<br><small class="mut">${info}</small></span></span><button class="btn alt sm" onclick="reactivate('${x.id}')">${t('react')}</button></div>`}).join(''):'');
 }
 async function openForm(id){
   const m=$('#main');
