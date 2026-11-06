@@ -65,6 +65,17 @@ details form{padding:.75rem 0}
 .lf{padding:.5rem 0 1rem;border-bottom:1px solid var(--ln)}
 .acts{display:flex;gap:.35rem}
 .pcard{margin:.75rem 0}
+.home{max-width:30rem;margin:0 auto;padding:1rem 1rem 2rem;min-height:100vh;display:flex;flex-direction:column}
+.home .tools{justify-content:flex-end;color:var(--pri)}
+.hero{text-align:center;margin:1rem 0 1.25rem;padding:1.4rem 1rem 1.2rem;background:var(--card);border-radius:16px;border-top:5px solid var(--acc);box-shadow:0 4px 18px rgba(46,58,140,.14)}
+.hero h1{font-family:Georgia,"Times New Roman",serif;font-size:1.35rem;line-height:1.25;color:var(--pri);margin:1rem 0 .3rem}
+.tag{color:var(--mut);margin:0}
+.big{display:flex;align-items:center;gap:.9rem;width:100%;text-align:left;padding:1rem 1.1rem;border-radius:12px;border:2px solid var(--pri);background:var(--card);color:var(--ink);font:inherit;cursor:pointer;margin:.6rem 0;box-shadow:0 2px 8px rgba(0,0,0,.07)}
+.big.pri{background:var(--pri);color:var(--onpri)}
+.big svg{width:2.1rem;height:2.1rem;flex:none}
+.big strong{display:block;font-size:1.05rem}
+.big small{display:block;opacity:.85}
+.foot{margin-top:auto;text-align:center;color:var(--mut);font-size:.85rem;padding-top:1.5rem}
 .pills{display:flex;gap:.4rem;flex-wrap:wrap;max-width:46rem;margin:0 auto;padding:.75rem 1rem 0}
 .pills:empty{display:none}
 .tabs{display:flex;gap:.25rem;overflow-x:auto;border-bottom:1px solid var(--ln);margin:.5rem 0}
@@ -153,7 +164,11 @@ category:['Catégorie (ex. Prière)','Category (e.g. Prayer)'],deact:['Désactiv
 searchmem:['Rechercher un membre à ajouter (2 lettres minimum)','Search for a member to add (2 letters minimum)'],
 copym:['Copier les membres de…','Copy members from…'],copyb:['Copier','Copy'],sno:['Aucun résultat','No results'],addbtn:['Ajouter','Add'],
 nodata2:['Enregistrez d’abord les présences dans l’onglet Présences (choisissez le groupe et la date, puis cliquez sur Enregistrer).','First save attendance in the Attendance tab (choose the group and date, then click Save).'],
-copyt:['Copier le résumé','Copy summary'],copied:['Résumé copié.','Summary copied.']
+copyt:['Copier le résumé','Copy summary'],copied:['Résumé copié.','Summary copied.'],
+tagline:['Annuaire et suivi des présences','Directory and attendance tracking'],
+nologin:['Aucun compte nécessaire','No account needed'],
+staffsub:['Pasteur, administrateurs et responsables de ministère','Pastor, administrators and ministry leaders'],
+est:['Fondée en 2016','Established 2016']
 };
 const HT={email:'Imèl',pw:'Modpas',login:'Konekte',out:'Dekonekte',att:'Prezans',dir:'Anyè',ppl:'Manm',date:'Dat',
 leg:'P = prezan, R = an reta, A = absan',rest:'Make rès yo prezan',save:'Anrejistre',saved:'Prezans anrejistre.',
@@ -183,7 +198,8 @@ gen:'Jenere rapò a',gotoatt:'Ale nan Prezans',
 inactive:'Minis ki pa aktif',othercat:'Lòt',category:'Kategori (egz. Priyè)',deact:'Dezaktive minis sa a',
 searchmem:'Chèche yon manm pou ajoute (omwen 2 lèt)',copym:'Kopye manm yo soti nan…',copyb:'Kopye',sno:'Pa gen rezilta',addbtn:'Ajoute',
 nodata2:'Anrejistre prezans yo anvan nan onglè Prezans (chwazi gwoup la ak dat la, epi klike sou Anrejistre).',
-copyt:'Kopye rezime a',copied:'Rezime kopye.'};
+copyt:'Kopye rezime a',copied:'Rezime kopye.',
+tagline:'Anyè ak swivi prezans',nologin:'Pa bezwen kont',staffsub:'Pastè, administratè ak responsab minis yo',est:'Fonde nan 2016'};
 const TR=Object.fromEntries([
 ['Informations personnelles','Personal information','Enfòmasyon pèsonèl'],
 ['Informations familiales','Family information','Enfòmasyon sou fanmi'],
@@ -290,11 +306,22 @@ const tools=extra=>`<span class="tools">${[['fr','FR','Français'],['en','EN','E
 
 function render(){document.documentElement.lang=lang;document.documentElement.style.fontSize=fs+'px';if(PUB){pubView();return}prof?shell():loginView()}
 
-function loginView(msg){
+let LMODE='home';
+function loginView(msg,mode){
+  LMODE=mode||(msg?'login':LMODE);
+  if(LMODE==='login')return loginForm(msg);
+  const ico=(d)=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
+  $('#app').innerHTML=`<main class="home">${tools()}
+  <div class="hero"><img class="lgl" src="${LOGO}" alt=""><h1>${esc(CHURCH)}</h1><p class="tag">${t('tagline')}</p></div>
+  <button class="big pri" onclick="pubGo()">${ico('<rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4h6v3H9z"/><path d="M8.5 12h7M8.5 16h5"/>')}<span><strong>${t('memberlink')}</strong><small>${t('nologin')}</small></span></button>
+  <button class="big" onclick="loginView('','login')">${ico('<rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>')}<span><strong>${t('staff')}</strong><small>${t('staffsub')}</small></span></button>
+  <p class="foot">${t('est')}</p></main>`;
+}
+function loginForm(msg){
   $('#app').innerHTML=`<main class="login">${tools()}<img class="lgl" src="${LOGO}" alt=""><h1>${esc(CHURCH)}</h1>
   <form id="lf"><label>${t('email')}<input type="email" id="em" required autocomplete="username"></label>
   <label>${t('pw')}<input type="password" id="pw" required autocomplete="current-password"></label>
-  <p class="msg" id="lm">${msg||''}</p><button class="btn">${t('login')}</button></form><p class="leg"><a href="#join" onclick="pubGo();return false">${t('memberlink')}</a></p></main>`;
+  <p class="msg" id="lm">${msg||''}</p><button class="btn">${t('login')}</button></form><p class="leg"><a href="#" onclick="loginView('','home');return false">${t('back')}</a></p></main>`;
   $('#lf').onsubmit=async e=>{e.preventDefault();
     const {error}=await sb.auth.signInWithPassword({email:$('#em').value.trim(),password:$('#pw').value});
     if(error)return $('#lm').textContent=t('bad');
@@ -316,7 +343,7 @@ function shell(){
   ({mem:viewMem,min:viewMin,att:viewAtt,cal:viewCal,rep:viewRep})[tab]();
 }
 function go(k){tab=k;shell()}
-async function logout(){await sb.auth.signOut();prof=null;render()}
+async function logout(){await sb.auth.signOut();prof=null;LMODE='home';render()}
 
 /* ---------- Attendance ---------- */
 async function viewAtt(){
