@@ -161,7 +161,7 @@ rnote:['Taux = (présents + en retard) / total marqué.','Rate = (present + late
 nodata:['Aucune présence enregistrée pour cette période.','No attendance recorded for this period.'],csv:['Exporter (Excel)','Export (Excel)'],
 sub:['Soumissions','Submissions'],approve:['Approuver','Approve'],reject:['Rejeter','Reject'],pending:['En attente','Pending'],
 changed:['Modifiée','Changed'],nosubs:['Aucune soumission en attente.','No pending submissions.'],
-share:['Partager le lien','Share the link'],sharenote:['Lien pour les membres (aucune connexion nécessaire) :','Link for members (no login needed):'],
+share:['Partager le lien','Share the link'],sharenote:['Lien de la page d’accueil à partager (nouveau visiteur ou déjà inscrit) :','Home page link to share (new visitor or already registered):'],
 sharemsg:['Remplissez vos informations pour l’annuaire de l’église :','Fill in your information for the church directory:'],
 back:['Retour','Back'],edit:['Modifier','Edit'],
 pubtitle:['Fiche d’inscription','Registration form'],
@@ -197,6 +197,10 @@ tagline:['Annuaire et suivi des présences','Directory and attendance tracking']
 nologin:['Aucun compte nécessaire','No account needed'],
 staffsub:['Pasteur, administrateurs et responsables de ministère','Pastor, administrators and ministry leaders'],
 est:['Fondée en 2016','Established 2016'],
+newvis:['Nouveau visiteur','New visitor'],newvissub:['Remplir ma fiche, aucun compte nécessaire','Fill in my form, no account needed'],
+reg:['Déjà inscrit','Already registered'],regsub:['Modifier ma fiche avec mon lien privé','Update my form with my private link'],
+regnote:['Après l’envoi de votre fiche, vous avez reçu un lien privé. Collez-le ici pour modifier vos informations. Si vous l’avez perdu, demandez à l’administration de vous aider.','After sending your form you received a private link. Paste it here to update your information. If you lost it, ask the administration to help.'],
+regph:['Collez votre lien privé ici','Paste your private link here'],regopen:['Ouvrir ma fiche','Open my form'],home:['Accueil','Home'],
 famaddrnote:['Une seule fois pour toute la famille.','Once for the whole family.'],
 searchname:['Rechercher un nom, téléphone ou famille…','Search a name, phone or family…'],
 mck:['L’annuaire de la famille de l’église et des ministères','The Church Family & Ministry Directory'],
@@ -215,7 +219,7 @@ unresp:'Li pa reponn ankò',ldate:'Dat li pati',lloc:'Nouvo kote (vil / peyi)',l
 avgp:'Mwayèn prezan',rate:'Pousantaj prezans',member:'Manm',grp:'Gwoup',rnote:'Pousantaj = (prezan + an reta) / total make.',
 nodata:'Pa gen prezans anrejistre pou peryòd sa a.',csv:'Ekspòte (Excel)',
 sub:'Soumisyon',approve:'Apwouve',reject:'Rejte',pending:'An atant',changed:'Modifye',nosubs:'Pa gen soumisyon an atant.',
-share:'Pataje lyen an',sharenote:'Lyen pou manm yo (pa bezwen konekte):',sharemsg:'Ranpli enfòmasyon ou pou anyè legliz la:',
+share:'Pataje lyen an',sharenote:'Lyen paj dakèy pou pataje (nouvo vizitè oswa deja anrejistre):',sharemsg:'Ranpli enfòmasyon ou pou anyè legliz la:',
 back:'Retounen',edit:'Modifye',pubtitle:'Fich enskripsyon',
 pubintro:'Ranpli enfòmasyon ou ak sa fanmi ou yo. Pa bezwen kont. Se sèlman prenom ak non ki obligatwa; yo mande detay yo sèlman si ou reponn Wi.',
 you:'Ou menm',fmem:'Manm fanmi',addm:'Ajoute yon manm fanmi',remove:'Retire',send:'Voye',famaddr:'Adrès fanmi an',
@@ -234,6 +238,9 @@ searchmem:'Chèche yon manm pou ajoute (omwen 2 lèt)',copym:'Kopye manm yo soti
 nodata2:'Anrejistre prezans yo anvan nan onglè Prezans (chwazi gwoup la ak dat la, epi klike sou Anrejistre).',
 copyt:'Kopye rezime a',copied:'Rezime kopye.',
 tagline:'Anyè ak swivi prezans',nologin:'Pa bezwen kont',staffsub:'Pastè, administratè ak responsab minis yo',est:'Fonde nan 2016',
+newvis:'Nouvo vizitè',newvissub:'Ranpli fich mwen, pa bezwen kont',reg:'Deja anrejistre',regsub:'Modifye fich mwen ak lyen prive mwen',
+regnote:'Apre ou fin voye fich ou, ou te resevwa yon lyen prive. Kole l isit la pou modifye enfòmasyon ou. Si ou pèdi l, mande administrasyon an pou ede ou.',
+regph:'Kole lyen prive ou a isit la',regopen:'Louvri fich mwen',home:'Paj dakèy',
 famaddrnote:'Yon sèl fwa pou tout fanmi an.',
 searchname:'Chèche yon non, telefòn oswa fanmi…',
 mck:'Anyè fanmi legliz la ak minis yo',mct:'Konekte yon fanmi alafwa.',
@@ -354,7 +361,8 @@ function loginView(msg,mode){
   <img class="mcx-img" src="ministry-connect.jpg" alt="Ministry Connect: ${esc(CHURCH)}" onerror="this.style.display='none';document.getElementById('mcfb').style.display='block'">
   <h1 id="mcfb" style="display:none;text-align:center">Ministry Connect</h1>
   <div class="mc-acts">
-    <button class="big pri" onclick="pubGo()">${ico('<rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4h6v3H9z"/><path d="M8.5 12h7M8.5 16h5"/>')}<span><strong>${t('memberlink')}</strong><small>${t('nologin')}</small></span></button>
+    <button class="big pri" onclick="pubGo()">${ico('<rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4h6v3H9z"/><path d="M8.5 12h7M8.5 16h5"/>')}<span><strong>${t('newvis')}</strong><small>${t('newvissub')}</small></span></button>
+    <button class="big" onclick="regGo()">${ico('<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/>')}<span><strong>${t('reg')}</strong><small>${t('regsub')}</small></span></button>
     <button class="big" onclick="loginView('','login')">${ico('<rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>')}<span><strong>${t('staff')}</strong><small>${t('staffsub')}</small></span></button>
   </div></main></div>`;
 }
@@ -677,7 +685,7 @@ async function store(v,o){
 }
 
 /* ---------- Admin: members list and edit form ---------- */
-function shareLink(){const u=location.origin+location.pathname+'#join';
+function shareLink(){const u=location.origin+location.pathname;
   if(navigator.share)navigator.share({title:CHURCH,text:t('sharemsg'),url:u}).catch(()=>{});
   else{if(navigator.clipboard)navigator.clipboard.writeText(u);window.open('https://wa.me/?text='+encodeURIComponent(t('sharemsg')+' '+u),'_blank')}}
 async function viewPpl(){
@@ -688,7 +696,7 @@ async function viewPpl(){
   const lp=x=>{const v=x.people_private;return (Array.isArray(v)?v[0]:v)||{}};
   const LK={moved:'moved',left:'leftc',unresponsive:'unresp'};
   m.innerHTML=`<div class="row"><button class="btn" onclick="openForm(null)">${t('add')}</button><button class="btn alt" onclick="shareLink()">${t('share')}</button></div>
-  <p class="leg">${t('sharenote')} ${esc(location.origin+location.pathname+'#join')}</p><input id="msq" type="search" class="srch" placeholder="${t('searchname')}" oninput="flt('msq','#main [data-s]')" autocomplete="off"><p class="leg" id="fn"></p><h2 class="sp">${t('ppl')} (${act.length})</h2>`
+  <p class="leg">${t('sharenote')} ${esc(location.origin+location.pathname)}</p><input id="msq" type="search" class="srch" placeholder="${t('searchname')}" oninput="flt('msq','#main [data-s]')" autocomplete="off"><p class="leg" id="fn"></p><h2 class="sp">${t('ppl')} (${act.length})</h2>`
   +act.map(x=>`<div id="w${x.id}" data-s="${esc(nrm([x.first_name,x.last_name,x.households&&x.households.name,x.phone,x.email].join(' ')))}"><div class="pr"><span class="mb">${av(x,u)}<span>${esc(x.first_name)} ${esc(x.last_name)}<br><small class="mut">${esc(x.households?.name||'')}${x.phone?', '+esc(x.phone):''}</small></span></span><span class="acts"><label class="btn alt sm">${t('photo')}<input type="file" accept="image/*" hidden onchange="setPhoto('${x.id}',this.files[0])"></label><button class="btn alt sm" onclick="openForm('${x.id}')">${t('edit')}</button><button class="btn alt sm" onclick="leaveForm('${x.id}')">${t('leave')}</button></span></div></div>`).join('')
   +(gone.length?`<h2 class="sp">${t('former')} (${gone.length})</h2>`+gone.map(x=>{const l=lp(x);
     const info=[l.left_status?t(LK[l.left_status]):'',l.left_date,l.left_location].filter(Boolean).map(esc).join(', ');
@@ -740,7 +748,7 @@ async function viewSub(){
   const {data,error}=await sb.from('submissions').select('token,payload,status,updated_at').in('status',['pending','changed']).order('updated_at');
   if(error)return m.innerHTML=`<p>${t('err')}${esc(error.message)}</p>`;
   const L=data||[];
-  m.innerHTML=`<p class="leg">${t('sharenote')} ${esc(location.origin+location.pathname+'#join')}</p><div class="row"><button class="btn alt" onclick="shareLink()">${t('share')}</button></div><h2 class="sp">${t('sub')} (${L.length})</h2>`
+  m.innerHTML=`<p class="leg">${t('sharenote')} ${esc(location.origin+location.pathname)}</p><div class="row"><button class="btn alt" onclick="shareLink()">${t('share')}</button></div><h2 class="sp">${t('sub')} (${L.length})</h2>`
   +(L.length?L.map(s=>{const P=s.payload.people||[],me=P.find(x=>x.role==='self')||P[0]||{};
     return `<div class="fam"><p><strong>${esc(me.last||'')}</strong> <span class="mut">(${t(s.status==='pending'?'pending':'changed')}, ${esc(String(s.updated_at).slice(0,10))})</span></p>
     <p class="mut">${P.map(x=>esc((x.first||'')+' '+(x.last||''))).join(', ')}</p>
@@ -874,7 +882,7 @@ async function delEv(id){if(!confirm(t('del')+' ?'))return;await sb.from('events
 let PUB=false,PTOK=null,pubView=()=>{};
 function pubGo(){history.replaceState(null,'','#join');pubStart()}
 function pubStart(){PUB=true;const h=location.hash;if(h.startsWith('#edit='))loadEdit(h.slice(6));else{PTOK=null;pubView=()=>pubForm(pubSnapshot());let d=null;try{d=JSON.parse(localStorage.getItem('fdraft')||'null')}catch(e){}if(d)d._draft=1;pubForm(d)}}
-function pubShell(){$('#app').innerHTML=`<header><span class="brand"><img class="lg" src="${LOGO}" alt=""><h1>${esc(CHURCH)}</h1></span>${tools(`<button onclick="location.href=location.pathname">${t('staff')}</button>`)}</header><main id="main"></main>`}
+function pubShell(){$('#app').innerHTML=`<header><span class="brand"><img class="lg" src="${LOGO}" alt=""><h1>${esc(CHURCH)}</h1></span>${tools(`<button onclick="location.href=location.pathname">${t('home')}</button>`)}</header><main id="main"></main>`}
 function pubSnapshot(){if(!$('#cards'))return null;
   return {adr:$('#fadr').value,city:$('#fcity').value,consent:$('#pc').checked,
     people:[...document.querySelectorAll('.pcard')].map(c=>Object.assign(serialize(c.querySelector('form')),{k:c.dataset.k},c.dataset.photo?{photo_path:c.dataset.photo}:{}))}}
@@ -938,10 +946,25 @@ function pubDone(tok){
   $('#cp').onclick=()=>{if(navigator.clipboard)navigator.clipboard.writeText(url);$('#cp').textContent='✓'};
   pubView=()=>pubDone(tok);
 }
+function regGo(){
+  const tk=localStorage.getItem('ftok');
+  if(tk){history.replaceState(null,'','#edit='+tk);loadEdit(tk);return}
+  PUB=true;pubShell();regPage();
+}
+function regPage(msg){
+  $('#main').innerHTML=`<h2>${t('reg')}</h2><p class="leg">${t('regnote')}</p><div class="row"><input id="rtk" placeholder="${t('regph')}" autocomplete="off"></div><p class="msg" id="rm">${msg||''}</p><div class="row"><button class="btn" onclick="regOpen()">${t('regopen')}</button><button class="btn alt" onclick="location.href=location.pathname">${t('back')}</button></div>`;
+  pubView=()=>regPage();
+}
+function regOpen(){
+  const m=$('#rtk').value.match(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i);
+  if(!m)return $('#rm').textContent=t('notfound');
+  history.replaceState(null,'','#edit='+m[0].toLowerCase());loadEdit(m[0].toLowerCase());
+}
 async function loadEdit(tok){
   PUB=true;pubShell();$('#main').innerHTML='<p>…</p>';
   const {data,error}=await sb.rpc('get_form',{tok});
-  if(error||!data){$('#main').innerHTML=`<p>${t('notfound')}</p>`;return}
+  if(error||!data){$('#main').innerHTML=`<p>${t('notfound')}</p><div class="row"><button class="btn alt" onclick="location.href=location.pathname">${t('back')}</button></div>`;return}
+  try{localStorage.setItem('ftok',tok)}catch(e){}
   PTOK=tok;pubView=()=>pubForm(pubSnapshot());
   const P=data.payload;pubForm({adr:P.adr,city:P.city,people:P.people,consent:true});
 }
