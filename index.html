@@ -197,6 +197,7 @@ tagline:['Annuaire et suivi des présences','Directory and attendance tracking']
 nologin:['Aucun compte nécessaire','No account needed'],
 staffsub:['Pasteur, administrateurs et responsables de ministère','Pastor, administrators and ministry leaders'],
 est:['Fondée en 2016','Established 2016'],
+famaddrnote:['Une seule fois pour toute la famille.','Once for the whole family.'],
 searchname:['Rechercher un nom, téléphone ou famille…','Search a name, phone or family…'],
 mck:['L’annuaire de la famille de l’église et des ministères','The Church Family & Ministry Directory'],
 mct:['Connecter une famille à la fois.','Connect One Family at a Time.'],
@@ -233,6 +234,7 @@ searchmem:'Chèche yon manm pou ajoute (omwen 2 lèt)',copym:'Kopye manm yo soti
 nodata2:'Anrejistre prezans yo anvan nan onglè Prezans (chwazi gwoup la ak dat la, epi klike sou Anrejistre).',
 copyt:'Kopye rezime a',copied:'Rezime kopye.',
 tagline:'Anyè ak swivi prezans',nologin:'Pa bezwen kont',staffsub:'Pastè, administratè ak responsab minis yo',est:'Fonde nan 2016',
+famaddrnote:'Yon sèl fwa pou tout fanmi an.',
 searchname:'Chèche yon non, telefòn oswa fanmi…',
 mck:'Anyè fanmi legliz la ak minis yo',mct:'Konekte yon fanmi alafwa.',
 mcd:'Ministry Connect se yon kote santral pou kenbe fanmi legliz nou an konekte, enfòme ak enplike. Li rasanble enfòmasyon manm yo, prezans nan minis yo, rapò, evènman legliz la, nouvo manm yo, fèt nesans, selebrasyon fanmi ak foto yo.',
@@ -881,9 +883,10 @@ function pubForm(S){
   const tk=localStorage.getItem('ftok');
   $('#main').innerHTML=`<h2>${t('pubtitle')}</h2><p class="leg">${PTOK?t('editnote'):t('pubintro')}</p>${S&&S._draft?`<p class="leg">${t('draftrest')} <a href="#" onclick="pubReset();return false">${t('restart')}</a></p>`:''}
   ${!PTOK&&tk?`<p><a href="#edit=${esc(tk)}" onclick="loadEdit('${esc(tk)}');return false">${t('myform')}</a></p>`:''}
-  <div class="sec"><div><strong>${t('famaddr')}</strong><div class="row"><input id="fadr" placeholder="${t('adr')}"><input id="fcity" placeholder="${t('city')}"></div></div></div>
+  
   <div id="cards"></div>
   <div class="row"><button type="button" class="btn alt" onclick="addCard()">${t('addm')}</button></div>
+  <div class="sec"><div><strong>${t('famaddr')}</strong> <small class="mut">${t('famaddrnote')}</small><div class="row"><input id="fadr" placeholder="${t('adr')}"><input id="fcity" placeholder="${t('city')}"></div></div></div>
   <input id="hp" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px">
   <label class="chk"><input type="checkbox" id="pc"> ${CONSENT}</label>
   <p class="msg" id="pm"></p><div class="row"><button class="btn" id="pb" onclick="pubSend()">${t('send')}</button>${PTOK?'':`<button type="button" class="btn alt" onclick="pubLater()">${t('laterbtn')}</button>`}</div>`;
