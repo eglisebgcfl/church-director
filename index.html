@@ -954,7 +954,7 @@ async function delEv(id){if(!confirm(t('del')+' ?'))return;await sb.from('events
 /* ---------- Public form: no login needed ---------- */
 let PUB=false,PTOK=null,pubView=()=>{};
 function pubGo(){history.replaceState(null,'','#join');pubStart()}
-function pubStart(){PUB=true;const h=location.hash;if(h.startsWith('#edit='))loadEdit(h.slice(6));else{PTOK=null;pubView=()=>pubForm(pubSnapshot());let d=null;try{d=JSON.parse(localStorage.getItem('fdraft')||'null')}catch(e){}if(d)d._draft=1;pubForm(d)}}
+function pubStart(){PUB=true;const h=location.hash;if(h.startsWith('#edit='))loadEdit(h.slice(6));else{PTOK=null;pubView=()=>pubForm(pubSnapshot());let d=null;try{d=JSON.parse(localStorage.getItem('fdraft')||'null')}catch(e){}if(d&&Date.now()-(d._t||0)>864e5)d=null;if(d)d._draft=1;pubForm(d)}}
 function pubShell(a){$('#app').innerHTML=`<header><span class="brand"><img class="lg" src="${LOGO}" alt=""><h1>${esc(CHURCH)}</h1></span>${tools(prof?`<button onclick="logout()">${t('out')}</button>`:'')}</header>${gnav(a||(PTOK?'reg':'new'))}<main id="main"></main>`}
 function pubSnapshot(){if(!$('#cards'))return null;
   return {adr:$('#fadr').value,city:$('#fcity').value,consent:$('#pc').checked,
@@ -963,7 +963,7 @@ function pubForm(S){
   pubShell();
   const tk=localStorage.getItem('ftok');
   $('#main').innerHTML=`<h2>${t('pubtitle')}</h2><p class="leg">${PTOK?t('editnote'):t('pubintro')}</p>${S&&S._draft?`<p class="leg">${t('draftrest')} <a href="#" onclick="pubReset();return false">${t('restart')}</a></p>`:''}
-  ${!PTOK&&tk?`<p><a href="#edit=${esc(tk)}" onclick="loadEdit('${esc(tk)}');return false">${t('myform')}</a></p>`:''}
+  
   
   <div id="cards"></div>
   <div class="row"><button type="button" class="btn alt" onclick="addCard()">${t('addm')}</button></div>
@@ -1007,12 +1007,12 @@ async function pubSend(){
   const {data,error}=PTOK?await sb.rpc('update_form',{tok:PTOK,p}):await sb.rpc('submit_form',{p});
   b.disabled=false;
   if(error)return o.textContent=t('err')+error.message;
-  const tok=PTOK||data;localStorage.setItem('ftok',tok);localStorage.removeItem('fdraft');pubDone(tok);
+  const tok=PTOK||data;localStorage.removeItem('ftok');localStorage.removeItem('fdraft');pubDone(tok);
 }
-const pubAuto=()=>later(()=>{if(PTOK||!$('#cards'))return;try{localStorage.setItem('fdraft',JSON.stringify(pubSnapshot()))}catch(e){}});
+const pubAuto=()=>later(()=>{if(PTOK||!$('#cards'))return;try{localStorage.setItem('fdraft',JSON.stringify(Object.assign(pubSnapshot(),{_t:Date.now()})))}catch(e){}});
 function pubReset(){localStorage.removeItem('fdraft');pubForm(null)}
 function pubLaterPage(){pubShell();$('#main').innerHTML=`<h2>${t('later')}</h2><p>${t('laterhow')}</p><div class="row"><button class="btn" onclick="pubStart()">${t('cont')}</button></div>`;pubView=pubLaterPage}
-function pubLater(){const sn=pubSnapshot();if(sn&&!PTOK){try{localStorage.setItem('fdraft',JSON.stringify(sn))}catch(e){}}pubLaterPage()}
+function pubLater(){const sn=pubSnapshot();if(sn&&!PTOK){try{localStorage.setItem('fdraft',JSON.stringify(Object.assign(sn,{_t:Date.now()})))}catch(e){}}pubLaterPage()}
 function pubDone(tok){
   pubShell();const url=location.origin+location.pathname+'#edit='+tok;
   $('#main').innerHTML=`<h2>${t('thanks')}</h2><p>${t('keeplink')}</p><p class="mut" style="word-break:break-all">${esc(url)}</p><div class="row"><button class="btn" id="cp">${t('copy')}</button></div>`;
@@ -1020,8 +1020,7 @@ function pubDone(tok){
   pubView=()=>pubDone(tok);
 }
 function regGo(){
-  const tk=localStorage.getItem('ftok');
-  if(tk){history.replaceState(null,'','#edit='+tk);loadEdit(tk);return}
+  try{localStorage.removeItem('ftok')}catch(e){}
   PUB=true;pubShell('reg');regPage();
 }
 function regPage(msg){
@@ -1037,7 +1036,6 @@ async function loadEdit(tok){
   PUB=true;pubShell('reg');$('#main').innerHTML='<p>…</p>';
   const {data,error}=await sb.rpc('get_form',{tok});
   if(error||!data){$('#main').innerHTML=`<p>${t('notfound')}</p><div class="row"><button class="btn alt" onclick="location.href=location.pathname">${t('back')}</button></div>`;return}
-  try{localStorage.setItem('ftok',tok)}catch(e){}
   PTOK=tok;pubView=()=>pubForm(pubSnapshot());
   const P=data.payload;pubForm({adr:P.adr,city:P.city,people:P.people,consent:true});
 }
