@@ -76,6 +76,7 @@ details form{padding:.75rem 0}
 .big strong{display:block;font-size:1.05rem}
 .big small{display:block;opacity:.85}
 .srch{width:100%;margin:.5rem 0}
+.note{background:#fff7e0;border:1px solid #f0d58a;color:#5a4300;padding:.6rem .8rem;border-radius:8px;margin:.6rem 0}
 .s4 div{min-width:4.5rem}
 .foot{margin-top:auto;text-align:center;color:var(--mut);font-size:.85rem;padding-top:1.5rem}
 .mc{min-height:100vh;position:relative;overflow:hidden;color:#fff;background:linear-gradient(135deg,#0e1858 0%,#1d2a82 48%,#3745c2 100%)}
@@ -206,6 +207,7 @@ tagline:['Annuaire et suivi des présences','Directory and attendance tracking']
 nologin:['Aucun compte nécessaire','No account needed'],
 staffsub:['Pasteur, administrateurs et responsables de ministère','Pastor, administrators and ministry leaders'],
 est:['Fondée en 2016','Established 2016'],
+nomembers:['Aucun membre pour le moment. Cliquez sur « Ajouter un nouveau membre » pour commencer.','No members yet. Click “Add a new member” to start.'],
 needlogin:['Connectez-vous pour utiliser cette fonction.','Log in to use this function.'],openapp:['Ouvrir l’application','Open the app'],
 P1:['Présents','Present'],R1:['En retard','Late'],A1:['Absents','Absent'],unm:['Non marqués','Not marked'],
 savedyes:['Présences enregistrées pour cette date.','Attendance saved for this date.'],
@@ -251,6 +253,7 @@ searchmem:'Chèche yon manm pou ajoute (omwen 2 lèt)',copym:'Kopye manm yo soti
 nodata2:'Anrejistre prezans yo anvan nan onglè Prezans (chwazi gwoup la ak dat la, epi klike sou Anrejistre).',
 copyt:'Kopye rezime a',copied:'Rezime kopye.',
 tagline:'Anyè ak swivi prezans',nologin:'Pa bezwen kont',staffsub:'Pastè, administratè ak responsab minis yo',est:'Fonde nan 2016',
+nomembers:'Poko gen manm. Klike sou « Ajoute yon nouvo manm » pou kòmanse.',
 needlogin:'Konekte pou itilize fonksyon sa a.',openapp:'Louvri aplikasyon an',
 P1:'Prezan',R1:'An reta',A1:'Absan',unm:'Pa make',savedyes:'Prezans anrejistre pou dat sa a.',savedno:'Poko anrejistre pou dat sa a.',
 newvis:'Nouvo vizitè',newvissub:'Ranpli fich mwen, pa bezwen kont',reg:'Deja anrejistre',regsub:'Modifye fich mwen ak lyen prive mwen',
@@ -427,10 +430,10 @@ function loginView(msg,mode){
   homeView();
 }
 function loginForm(msg){
-  $('#app').innerHTML=`<div class="mc"><div class="mc-nav">${tools()}${gnav(NEXT||'',true)}</div><main class="login"><h2>${t('staff')}</h2><p class="leg">${t('staffsub')}</p>
+  $('#app').innerHTML=`<div class="mc"><div class="mc-nav">${tools()}${gnav(NEXT||'',true)}</div><main class="login"><h2>${t('staff')}</h2><p class="leg">${t('staffsub')}</p>${msg?`<p class="note">${msg}</p>`:''}
   <form id="lf"><label>${t('email')}<input type="email" id="em" required autocomplete="username"></label>
   <label>${t('pw')}<input type="password" id="pw" required autocomplete="current-password"></label>
-  <p class="msg" id="lm">${msg||''}</p><button class="btn">${t('login')}</button></form><p class="leg"><a href="#" onclick="loginView('','home');return false">${t('back')}</a></p></main></div>`;
+  <p class="msg" id="lm"></p><button class="btn">${t('login')}</button></form><p class="leg"><a href="#" onclick="loginView('','home');return false">${t('back')}</a></p></main></div>`;
   $('#lf').onsubmit=async e=>{e.preventDefault();
     const {error}=await sb.auth.signInWithPassword({email:$('#em').value.trim(),password:$('#pw').value});
     if(error)return $('#lm').textContent=t('bad');
@@ -481,7 +484,7 @@ async function loadAtt(){
 }
 function drawAtt(){
   const l=$('#list');if(!l)return;
-  if(!cur.people.length){l.innerHTML=`<p>${t('nom')}</p>`;return}
+  if(!cur.people.length){l.innerHTML=`<p>${t('nom')}</p><div class="row"><button class="btn" onclick="goMin('${$('#g').value}')">${t('addmem')}</button></div>`;return}
   l.innerHTML=attSum()+cur.people.map(p=>`<div class="pr"><span>${esc(p.first_name)} ${esc(p.last_name)}</span><span class="st">${['P','R','A'].map(k=>`<button class="${k}${cur.st[p.id]===k?' on':''}" onclick="mark('${p.id}','${k}')">${k}</button>`).join('')}</span></div>`).join('')
   +`<div class="row"><button class="btn alt" onclick="restP()">${t('rest')}</button><button class="btn" onclick="saveAtt()">${t('save')}</button></div>`;
 }
@@ -763,7 +766,7 @@ async function viewPpl(){
   const lp=x=>{const v=x.people_private;return (Array.isArray(v)?v[0]:v)||{}};
   const LK={moved:'moved',left:'leftc',unresponsive:'unresp'};
   m.innerHTML=`<div class="row"><button class="btn" onclick="openForm(null)">${t('add')}</button><button class="btn alt" onclick="shareLink()">${t('share')}</button></div>
-  <p class="leg">${t('sharenote')} ${esc(location.origin+location.pathname)}</p><input id="msq" type="search" class="srch" placeholder="${t('searchname')}" oninput="flt('msq','#main [data-s]')" autocomplete="off"><p class="leg" id="fn"></p><h2 class="sp">${t('ppl')} (${act.length})</h2>`
+  <p class="leg">${t('sharenote')} ${esc(location.origin+location.pathname)}</p><input id="msq" type="search" class="srch" placeholder="${t('searchname')}" oninput="flt('msq','#main [data-s]')" autocomplete="off"><p class="leg" id="fn"></p><h2 class="sp">${t('ppl')} (${act.length})</h2>${act.length?'':`<p>${t('nomembers')}</p>`}`
   +act.map(x=>`<div id="w${x.id}" data-s="${esc(nrm([x.first_name,x.last_name,x.households&&x.households.name,x.phone,x.email].join(' ')))}"><div class="pr"><span class="mb">${av(x,u)}<span>${esc(x.first_name)} ${esc(x.last_name)}<br><small class="mut">${esc(x.households?.name||'')}${x.phone?', '+esc(x.phone):''}</small></span></span><span class="acts"><label class="btn alt sm">${t('photo')}<input type="file" accept="image/*" hidden onchange="setPhoto('${x.id}',this.files[0])"></label><button class="btn alt sm" onclick="openForm('${x.id}')">${t('edit')}</button><button class="btn alt sm" onclick="leaveForm('${x.id}')">${t('leave')}</button></span></div></div>`).join('')
   +(gone.length?`<h2 class="sp">${t('former')} (${gone.length})</h2>`+gone.map(x=>{const l=lp(x);
     const info=[l.left_status?t(LK[l.left_status]):'',l.left_date,l.left_location].filter(Boolean).map(esc).join(', ');
@@ -847,7 +850,10 @@ async function viewMem(){
 /* ---------- Ministries ---------- */
 const minForm=(g,cats)=>`<div class="row"><input name="fr" placeholder="Français" required value="${esc(g?g.name_fr:'')}"><input name="en" placeholder="English" required value="${esc(g?g.name_en:'')}"><input name="ht" placeholder="Kreyòl" value="${esc(g&&g.name_ht||'')}"></div>
   <label>${t('category')}<input name="cat" list="cats" value="${esc(g&&g.category||'')}"></label><datalist id="cats">${cats.map(c=>`<option value="${esc(c)}">`).join('')}</datalist>`;
+let OPENG=null;
+function goMin(g){OPENG=g;tab='min';shell()}
 async function viewMin(){
+  if(OPENG){const g=OPENG;OPENG=null;return openMin(g)}
   const m=$('#main'),adm=prof.role==='admin';
   const [g,ml,ld,pf]=await Promise.all([
     sb.from('groups').select('id,name_fr,name_en,name_ht,category,active').order('name_fr'),
@@ -863,7 +869,7 @@ async function viewMin(){
   const row=x=>`<div class="pr"><span><strong>${gname(x)}</strong><br><small class="mut">${cnt[x.id]||0} ${t('mem')}${lead[x.id]?', '+esc(lead[x.id].join(', ')):''}</small></span><button class="btn alt sm" onclick="openMin('${x.id}')">${adm?t('edit'):t('mem')}</button></div>`;
   const by={};on.forEach(x=>{(by[x.category||'']??=[]).push(x)});
   const keys=Object.keys(by).sort((x,y)=>(x===''?1:0)-(y===''?1:0)||x.localeCompare(y));
-  m.innerHTML=(adm?`<details><summary class="btn">${t('addmin')}</summary><form onsubmit="addMin(event)">${minForm(null,cats)}<button class="btn">${t('save')}</button><p class="msg" id="mm"></p></form></details>`:'')
+  m.innerHTML=(adm?`<details${on.length?'':' open'}><summary class="btn">${t('addmin')}</summary><form onsubmit="addMin(event)">${minForm(null,cats)}<button class="btn">${t('save')}</button><p class="msg" id="mm"></p></form></details>`:'')
    +keys.map(k=>(k?`<h2 class="sp">${esc(k)}</h2>`:(keys.length>1?`<h2 class="sp">${t('othercat')}</h2>`:''))+by[k].map(row).join('')).join('')
    +(adm&&off.length?`<h2 class="sp">${t('inactive')}</h2>`+off.map(x=>`<div class="pr"><span>${gname(x)}</span><button class="btn alt sm" onclick="setMinActive('${x.id}',true)">${t('react')}</button></div>`).join(''):'');
 }
@@ -925,7 +931,7 @@ async function viewCal(){
   const G=g.data||[],mine=new Set(G.map(x=>x.id)),L=ev.data||[];
   const title=calM.toLocaleDateString(loc(),{month:'long',year:'numeric'});
   SHARE={subject:`${CHURCH}: ${t('cal')} ${title}`,text:`${CHURCH}\n${title}\n\n`+(L.length?L.map(x=>{const tm=[x.start_time,x.end_time].filter(Boolean).map(v=>v.slice(0,5)).join('-');return `- ${x.event_date.slice(8)}/${x.event_date.slice(5,7)} ${x.title}${tm?', '+tm:''}${x.location?', '+x.location:''}`}).join('\n'):t('noev'))};
-  const form=(adm||G.length)?`<details><summary class="btn">${t('addev')}</summary><form id="ef" onsubmit="saveEv(event)">
+  const form=(adm||G.length)?`<details${L.length?'':' open'}><summary class="btn">${t('addev')}</summary><form id="ef" onsubmit="saveEv(event)">
    <label>${t('evtitle')}<input name="title" required></label>
    <div class="row"><label>${t('date')}<input name="d" type="date" value="${ymd(new Date())}" required></label><label>${t('start')}<input name="s" type="time"></label><label>${t('end')}<input name="e" type="time"></label></div>
    <label>${t('minist')}<select name="g">${adm?`<option value="">${t('whole')}</option>`:''}${G.map(x=>`<option value="${x.id}">${gname(x)}</option>`).join('')}</select></label>
