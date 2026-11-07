@@ -99,8 +99,13 @@ details form{padding:.75rem 0}
 .mcx{min-height:100vh;background:linear-gradient(135deg,#14206b,#2f3ca8);color:#fff}
 .mcx-in{max-width:78rem;margin:0 auto;padding:.75rem 1rem 2rem}
 .mcx .tools{justify-content:flex-end;color:#fff;margin-bottom:.5rem}
-.mcx-img{display:block;width:100%;height:auto}
-.mcx .mc-acts{margin:1.25rem auto 0;max-width:30rem}
+.mcx-img{display:block;width:auto;height:auto;max-width:100%;max-height:40vh;margin:0 auto}
+.mcx .mc-acts{margin:1rem auto 0;max-width:60rem;display:grid;gap:.6rem;grid-template-columns:repeat(auto-fit,minmax(15rem,1fr))}
+.mcx .big{margin:0}
+.gnav.dark{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.25);border-radius:10px;padding:0 .4rem;margin:.25rem 0 .9rem}
+.gnav.dark button{color:#dfe4ff}
+.gnav.dark button.on{color:#fff;border-color:#e41f26}
+.mc-nav{position:relative;z-index:1;max-width:72rem;margin:0 auto;padding:.75rem 1rem 0}
 .mcx .big{background:rgba(255,255,255,.1);border:2px solid rgba(255,255,255,.6);color:#fff}
 .mcx .big.pri{background:#e41f26;border-color:#e41f26}
 .mc .login{background:var(--card);color:var(--ink);border-radius:16px;padding:1.2rem;margin-top:6vh;position:relative;z-index:1}
@@ -199,6 +204,7 @@ tagline:['Annuaire et suivi des présences','Directory and attendance tracking']
 nologin:['Aucun compte nécessaire','No account needed'],
 staffsub:['Pasteur, administrateurs et responsables de ministère','Pastor, administrators and ministry leaders'],
 est:['Fondée en 2016','Established 2016'],
+needlogin:['Connectez-vous pour utiliser cette fonction.','Log in to use this function.'],openapp:['Ouvrir l’application','Open the app'],
 P1:['Présents','Present'],R1:['En retard','Late'],A1:['Absents','Absent'],unm:['Non marqués','Not marked'],
 savedyes:['Présences enregistrées pour cette date.','Attendance saved for this date.'],
 savedno:['Pas encore enregistré pour cette date.','Not saved yet for this date.'],
@@ -243,6 +249,7 @@ searchmem:'Chèche yon manm pou ajoute (omwen 2 lèt)',copym:'Kopye manm yo soti
 nodata2:'Anrejistre prezans yo anvan nan onglè Prezans (chwazi gwoup la ak dat la, epi klike sou Anrejistre).',
 copyt:'Kopye rezime a',copied:'Rezime kopye.',
 tagline:'Anyè ak swivi prezans',nologin:'Pa bezwen kont',staffsub:'Pastè, administratè ak responsab minis yo',est:'Fonde nan 2016',
+needlogin:'Konekte pou itilize fonksyon sa a.',openapp:'Louvri aplikasyon an',
 P1:'Prezan',R1:'An reta',A1:'Absan',unm:'Pa make',savedyes:'Prezans anrejistre pou dat sa a.',savedno:'Poko anrejistre pou dat sa a.',
 newvis:'Nouvo vizitè',newvissub:'Ranpli fich mwen, pa bezwen kont',reg:'Deja anrejistre',regsub:'Modifye fich mwen ak lyen prive mwen',
 regnote:'Apre ou fin voye fich ou, ou te resevwa yon lyen prive. Kole l isit la pou modifye enfòmasyon ou. Si ou pèdi l, mande administrasyon an pou ede ou.',
@@ -356,24 +363,44 @@ function setLang(l){lang=l;localStorage.setItem('lang',l);render()}
 function setFs(d){fs=Math.min(24,Math.max(13,fs+d));localStorage.setItem('fs',fs);document.documentElement.style.fontSize=fs+'px'}
 const tools=extra=>`<span class="tools">${[['fr','FR','Français'],['en','EN','English'],['ht','KR','Kreyòl']].map(([c,l,n])=>`<button onclick="setLang('${c}')" title="${n}"${c===lang?' style="font-weight:700;text-decoration:underline"':''}>${l}</button>`).join('')}<button onclick="setFs(-1)" aria-label="A-">A−</button><button onclick="setFs(1)" aria-label="A+">A+</button>${extra||''}</span>`;
 
-function render(){document.documentElement.lang=lang;document.documentElement.style.fontSize=fs+'px';if(PUB){pubView();return}prof?shell():loginView()}
+let HOMEV=false,NEXT=null;
+function gnav(active,dark){
+  const staff=prof&&prof.role!=='admin'?['min','att','cal','rep']:['mem','min','att','cal','rep'];
+  const items=[['home','home'],['new','newvis'],['reg','reg']].concat(staff.map(k=>[k,k]));
+  return `<nav class="gnav${dark?' dark':''}">${items.map(([k,l])=>`<button class="${active===k?'on':''}" onclick="navTo('${k}')">${t(l)}</button>`).join('')}</nav>`;
+}
+function navTo(k){
+  history.replaceState(null,'',location.pathname);
+  if(k==='home'){PUB=false;if(prof){HOMEV=true;homeView()}else loginView('','home');return}
+  if(k==='new'){HOMEV=false;pubGo();return}
+  if(k==='reg'){HOMEV=false;regGo();return}
+  PUB=false;
+  if(!prof){NEXT=k;loginView(t('needlogin'),'login');return}
+  HOMEV=false;tab=k;shell();
+}
+function render(){document.documentElement.lang=lang;document.documentElement.style.fontSize=fs+'px';if(PUB){pubView();return}if(HOMEV&&prof){homeView();return}prof?shell():loginView()}
 
 let LMODE='home';
-function loginView(msg,mode){
-  LMODE=mode||(msg?'login':LMODE);
-  if(LMODE==='login')return loginForm(msg);
-  const ico=d=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
-  $('#app').innerHTML=`<div class="mcx"><main class="mcx-in">${tools()}
+const ico=d=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
+function homeView(){
+  $('#app').innerHTML=`<div class="mcx"><main class="mcx-in">${tools(prof?`<button onclick="logout()">${t('out')}</button>`:'')}
+  ${gnav('home',true)}
   <img class="mcx-img" src="${MCJPG}" alt="Ministry Connect: ${esc(CHURCH)}" onerror="this.style.display='none';document.getElementById('mcfb').style.display='block'">
   <h1 id="mcfb" style="display:none;text-align:center">Ministry Connect</h1>
   <div class="mc-acts">
-    <button class="big pri" onclick="pubGo()">${ico('<rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4h6v3H9z"/><path d="M8.5 12h7M8.5 16h5"/>')}<span><strong>${t('newvis')}</strong><small>${t('newvissub')}</small></span></button>
-    <button class="big" onclick="regGo()">${ico('<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/>')}<span><strong>${t('reg')}</strong><small>${t('regsub')}</small></span></button>
-    <button class="big" onclick="loginView('','login')">${ico('<rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>')}<span><strong>${t('staff')}</strong><small>${t('staffsub')}</small></span></button>
+    <button class="big pri" onclick="navTo('new')">${ico('<rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4h6v3H9z"/><path d="M8.5 12h7M8.5 16h5"/>')}<span><strong>${t('newvis')}</strong><small>${t('newvissub')}</small></span></button>
+    <button class="big" onclick="navTo('reg')">${ico('<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/>')}<span><strong>${t('reg')}</strong><small>${t('regsub')}</small></span></button>
+    ${prof?`<button class="big" onclick="HOMEV=false;go(tab)">${ico('<rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>')}<span><strong>${t('openapp')}</strong><small>${esc(prof.full_name||'')}</small></span></button>`
+    :`<button class="big" onclick="loginView('','login')">${ico('<rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>')}<span><strong>${t('staff')}</strong><small>${t('staffsub')}</small></span></button>`}
   </div></main></div>`;
 }
+function loginView(msg,mode){
+  LMODE=mode||(msg?'login':LMODE);
+  if(LMODE==='login')return loginForm(msg);
+  homeView();
+}
 function loginForm(msg){
-  $('#app').innerHTML=`<div class="mc"><main class="login">${tools()}<img class="lgl" src="${LOGO}" alt=""><h1>${esc(CHURCH)}</h1>
+  $('#app').innerHTML=`<div class="mc"><div class="mc-nav">${gnav(NEXT||'',true)}</div><main class="login">${tools()}<img class="lgl" src="${LOGO}" alt=""><h1>${esc(CHURCH)}</h1>
   <form id="lf"><label>${t('email')}<input type="email" id="em" required autocomplete="username"></label>
   <label>${t('pw')}<input type="password" id="pw" required autocomplete="current-password"></label>
   <p class="msg" id="lm">${msg||''}</p><button class="btn">${t('login')}</button></form><p class="leg"><a href="#" onclick="loginView('','home');return false">${t('back')}</a></p></main></div>`;
@@ -388,17 +415,17 @@ async function boot(){
   if(!session)return render();
   const {data}=await sb.from('profiles').select('role,full_name').eq('id',session.user.id).maybeSingle();
   if(!data){await sb.auth.signOut();prof=null;return loginView(t('nop'))}
-  prof=data;tab=data.role==='admin'?'mem':'att';render();
+  prof=data;tab=NEXT&&(data.role==='admin'||NEXT!=='mem')?NEXT:(data.role==='admin'?'mem':'att');NEXT=null;HOMEV=false;render();
 }
 
 function shell(){
   const tabs=prof.role==='admin'?['mem','min','att','cal','rep']:['min','att','cal','rep'];
   $('#app').innerHTML=`<header><span class="brand"><img class="lg" src="${LOGO}" alt=""><h1>${esc(CHURCH)}</h1></span>${tools(`<button onclick="logout()">${t('out')}</button>`)}</header>
-  <nav>${tabs.map(k=>`<button class="${tab===k?'on':''}" onclick="go('${k}')">${t(k)}</button>`).join('')}</nav><div id="subnav" class="pills"></div><main id="main"></main>`;
+  ${gnav(tab)}<div id="subnav" class="pills"></div><main id="main"></main>`;
   ({mem:viewMem,min:viewMin,att:viewAtt,cal:viewCal,rep:viewRep})[tab]();
 }
 function go(k){tab=k;shell()}
-async function logout(){await sb.auth.signOut();prof=null;LMODE='home';render()}
+async function logout(){await sb.auth.signOut();prof=null;LMODE='home';PUB=false;HOMEV=false;history.replaceState(null,'',location.pathname);render()}
 
 /* ---------- Attendance ---------- */
 async function viewAtt(){
@@ -893,7 +920,7 @@ async function delEv(id){if(!confirm(t('del')+' ?'))return;await sb.from('events
 let PUB=false,PTOK=null,pubView=()=>{};
 function pubGo(){history.replaceState(null,'','#join');pubStart()}
 function pubStart(){PUB=true;const h=location.hash;if(h.startsWith('#edit='))loadEdit(h.slice(6));else{PTOK=null;pubView=()=>pubForm(pubSnapshot());let d=null;try{d=JSON.parse(localStorage.getItem('fdraft')||'null')}catch(e){}if(d)d._draft=1;pubForm(d)}}
-function pubShell(){$('#app').innerHTML=`<header><span class="brand"><img class="lg" src="${LOGO}" alt=""><h1>${esc(CHURCH)}</h1></span>${tools(`<button onclick="location.href=location.pathname">${t('home')}</button>`)}</header><main id="main"></main>`}
+function pubShell(a){$('#app').innerHTML=`<header><span class="brand"><img class="lg" src="${LOGO}" alt=""><h1>${esc(CHURCH)}</h1></span>${tools(prof?`<button onclick="logout()">${t('out')}</button>`:'')}</header>${gnav(a||(PTOK?'reg':'new'))}<main id="main"></main>`}
 function pubSnapshot(){if(!$('#cards'))return null;
   return {adr:$('#fadr').value,city:$('#fcity').value,consent:$('#pc').checked,
     people:[...document.querySelectorAll('.pcard')].map(c=>Object.assign(serialize(c.querySelector('form')),{k:c.dataset.k},c.dataset.photo?{photo_path:c.dataset.photo}:{}))}}
@@ -960,7 +987,7 @@ function pubDone(tok){
 function regGo(){
   const tk=localStorage.getItem('ftok');
   if(tk){history.replaceState(null,'','#edit='+tk);loadEdit(tk);return}
-  PUB=true;pubShell();regPage();
+  PUB=true;pubShell('reg');regPage();
 }
 function regPage(msg){
   $('#main').innerHTML=`<h2>${t('reg')}</h2><p class="leg">${t('regnote')}</p><div class="row"><input id="rtk" placeholder="${t('regph')}" autocomplete="off"></div><p class="msg" id="rm">${msg||''}</p><div class="row"><button class="btn" onclick="regOpen()">${t('regopen')}</button><button class="btn alt" onclick="location.href=location.pathname">${t('back')}</button></div>`;
@@ -972,7 +999,7 @@ function regOpen(){
   history.replaceState(null,'','#edit='+m[0].toLowerCase());loadEdit(m[0].toLowerCase());
 }
 async function loadEdit(tok){
-  PUB=true;pubShell();$('#main').innerHTML='<p>…</p>';
+  PUB=true;pubShell('reg');$('#main').innerHTML='<p>…</p>';
   const {data,error}=await sb.rpc('get_form',{tok});
   if(error||!data){$('#main').innerHTML=`<p>${t('notfound')}</p><div class="row"><button class="btn alt" onclick="location.href=location.pathname">${t('back')}</button></div>`;return}
   try{localStorage.setItem('ftok',tok)}catch(e){}
