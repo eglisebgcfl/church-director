@@ -42,8 +42,8 @@ summary::-webkit-details-marker{display:none}
 .fam h2{font-size:1.1rem;margin-bottom:.25rem}
 .fam p{margin:.35rem 0}
 fieldset{border:1px solid var(--ln);border-radius:6px;margin:.75rem 0}
-.chk{display:inline-flex;align-items:center;gap:.4rem;margin:.25rem .75rem .25rem 0}
-.chk input{width:auto}
+.chk{display:flex;align-items:flex-start;gap:.55rem;margin:.4rem 0}
+.chk input{width:1.2rem;height:1.2rem;margin-top:.1rem;flex:none;accent-color:var(--pri)}
 .mut,.leg{color:var(--mut)}
 .leg{font-size:.9rem;margin:.25rem 0 .5rem}
 .msg{color:var(--mut);min-height:1.4em}
@@ -100,11 +100,13 @@ details form{padding:.75rem 0}
 .mcx-in{max-width:78rem;margin:0 auto;padding:.75rem 1rem 2rem}
 .mcx .tools{justify-content:flex-end;color:#fff;margin-bottom:.5rem}
 .mcx-img{display:block;width:auto;height:auto;max-width:100%;max-height:40vh;margin:0 auto}
-.mcx .mc-acts{margin:1rem auto 0;max-width:60rem;display:grid;gap:.6rem;grid-template-columns:repeat(auto-fit,minmax(15rem,1fr))}
+.mcx .mc-acts{margin:1rem auto 0;max-width:26rem;display:grid;gap:.6rem}
 .mcx .big{margin:0}
 .gnav.dark{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.25);border-radius:10px;padding:0 .4rem;margin:.25rem 0 .9rem}
 .gnav.dark button{color:#dfe4ff}
 .gnav.dark button.on{color:#fff;border-color:#e41f26}
+.mc-nav .tools{justify-content:flex-end;color:#fff;margin-bottom:.5rem}
+.login h2{margin:0 0 .25rem}
 .mc-nav{position:relative;z-index:1;max-width:72rem;margin:0 auto;padding:.75rem 1rem 0}
 .mcx .big{background:rgba(255,255,255,.1);border:2px solid rgba(255,255,255,.6);color:#fff}
 .mcx .big.pri{background:#e41f26;border-color:#e41f26}
@@ -344,7 +346,34 @@ const TR=Object.fromEntries([
 ['Je certifie que les renseignements sont exacts et j’autorise l’église à les conserver pour les besoins administratifs, pastoraux et de communication.','I certify that the information is accurate and authorize the church to keep it for administrative, pastoral and communication purposes.','Mwen sètifye enfòmasyon yo kòrèk epi mwen otorize legliz la kenbe yo pou bezwen administratif, pastoral ak kominikasyon.'],
 ['Informations spirituelles de l’enfant','Child’s spiritual information','Enfòmasyon espirityèl timoun nan'],
 ['L’enfant a-t-il accepté Jésus-Christ ?','Has the child accepted Jesus Christ?','Eske timoun nan te aksepte Jezi Kris?'],
-['L’enfant est-il déjà baptisé ?','Has the child already been baptized?','Eske timoun nan deja batize?']
+['L’enfant est-il déjà baptisé ?','Has the child already been baptized?','Eske timoun nan deja batize?'],
+['Déjà membre','Already a member','Deja manm'],
+['Pas encore','Not yet','Poko'],
+['Quels sont vos dons spirituels ?','What are your spiritual gifts?','Ki dòn espirityèl ou yo?'],
+['Autres dons, talents ou compétences (précisez)','Other gifts, talents or skills (specify)','Lòt dòn, talan oswa konpetans (presize)'],
+['Enseignement','Teaching','Anseyman'],['Encouragement (exhortation)','Encouragement (exhortation)','Ankourajman (egzòtasyon)'],
+['Miséricorde','Mercy','Mizèrikòd'],['Service et aide','Service and helps','Sèvis ak èd'],['Générosité (don)','Giving','Jenerozite (bay)'],
+['Direction (leadership)','Leadership','Direksyon (lidèchip)'],['Prophétie','Prophecy','Pwofesi'],
+['Discernement des esprits','Discernment of spirits','Disènman espri yo'],['Parole de sagesse','Word of wisdom','Pawòl sajès'],
+['Parole de connaissance','Word of knowledge','Pawòl konesans'],['Foi','Faith','Lafwa'],['Guérison','Healing','Gerizon'],['Miracles','Miracles','Mirak'],
+['Parler en langues','Speaking in tongues','Pale nan lang'],['Interprétation des langues','Interpretation of tongues','Entèpretasyon lang yo'],
+['Pastorat (prendre soin des autres)','Pastoring (caring for others)','Pastora (pran swen lòt moun)'],['Hospitalité','Hospitality','Ospitalite'],
+['Dans quels domaines de service aimeriez-vous contribuer au sein de l’Église ?','In which areas of service would you like to contribute within the church?','Nan ki domèn sèvis ou ta renmen kontribye nan legliz la?'],
+['Accueil et hospitalité','Welcome and hospitality','Akèy ak ospitalite'],
+['Prière et intercession','Prayer and intercession','Lapriyè ak entèsesyon'],
+['Louange et adoration','Praise and worship','Louanj ak adorasyon'],
+['Musique et instruments','Music and instruments','Mizik ak enstriman'],
+['Chorale et chant','Choir and singing','Koral ak chante'],
+['Enseignement biblique','Bible teaching','Anseyman biblik'],
+['Évangélisation et missions','Evangelism and missions','Evanjelizasyon ak misyon'],
+['Visitation et accompagnement','Visitation and support','Vizit ak akonpayman'],
+['Jeunesse et enfants','Youth and children','Jènn yo ak timoun yo'],
+['Assistance aux personnes dans le besoin','Helping people in need','Ede moun ki nan bezwen'],
+['Organisation et coordination des activités','Organizing and coordinating activities','Òganizasyon ak kowòdinasyon aktivite yo'],
+['Communication et médias','Communication and media','Kominikasyon ak medya'],
+['Entretien et maintenance de l’église','Church upkeep and maintenance','Antretyen ak mententans legliz la'],
+['Administration et secrétariat','Administration and secretarial work','Administrasyon ak sekretarya'],
+['Décoration et préparation des événements','Decoration and event preparation','Dekorasyon ak preparasyon evènman yo']
 ].map(([a,...b])=>[a,b]));
 const tr=x=>{const e=TR[x];return lang==='fr'||!e?x:e[lang==='en'?0:1]};
 function tx(root){if(lang==='fr')return;const i=lang==='en'?0:1;
@@ -388,8 +417,6 @@ function homeView(){
   <img class="mcx-img" src="${MCJPG}" alt="Ministry Connect: ${esc(CHURCH)}" onerror="this.style.display='none';document.getElementById('mcfb').style.display='block'">
   <h1 id="mcfb" style="display:none;text-align:center">Ministry Connect</h1>
   <div class="mc-acts">
-    <button class="big pri" onclick="navTo('new')">${ico('<rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4h6v3H9z"/><path d="M8.5 12h7M8.5 16h5"/>')}<span><strong>${t('newvis')}</strong><small>${t('newvissub')}</small></span></button>
-    <button class="big" onclick="navTo('reg')">${ico('<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/>')}<span><strong>${t('reg')}</strong><small>${t('regsub')}</small></span></button>
     ${prof?`<button class="big" onclick="HOMEV=false;go(tab)">${ico('<rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>')}<span><strong>${t('openapp')}</strong><small>${esc(prof.full_name||'')}</small></span></button>`
     :`<button class="big" onclick="loginView('','login')">${ico('<rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>')}<span><strong>${t('staff')}</strong><small>${t('staffsub')}</small></span></button>`}
   </div></main></div>`;
@@ -400,7 +427,7 @@ function loginView(msg,mode){
   homeView();
 }
 function loginForm(msg){
-  $('#app').innerHTML=`<div class="mc"><div class="mc-nav">${gnav(NEXT||'',true)}</div><main class="login">${tools()}<img class="lgl" src="${LOGO}" alt=""><h1>${esc(CHURCH)}</h1>
+  $('#app').innerHTML=`<div class="mc"><div class="mc-nav">${tools()}${gnav(NEXT||'',true)}</div><main class="login"><h2>${t('staff')}</h2><p class="leg">${t('staffsub')}</p>
   <form id="lf"><label>${t('email')}<input type="email" id="em" required autocomplete="username"></label>
   <label>${t('pw')}<input type="password" id="pw" required autocomplete="current-password"></label>
   <p class="msg" id="lm">${msg||''}</p><button class="btn">${t('login')}</button></form><p class="leg"><a href="#" onclick="loginView('','home');return false">${t('back')}</a></p></main></div>`;
@@ -587,6 +614,8 @@ async function viewDir(){
 
 /* ---------- Form definition ---------- */
 const MIN=['Louange et Adoration','École du Dimanche','Ministère des Enfants','Jeunesse','Accueil','Technique / Multimédia','Évangélisation','Intercession','Service Communautaire','Administration','Autre'];
+const SERVE=['Accueil et hospitalité','Prière et intercession','Louange et adoration','Musique et instruments','Chorale et chant','Enseignement biblique','Évangélisation et missions','Visitation et accompagnement','Jeunesse et enfants','Assistance aux personnes dans le besoin','Organisation et coordination des activités','Communication et médias','Entretien et maintenance de l’église','Administration et secrétariat','Décoration et préparation des événements'];
+const GIFTS=['Enseignement','Encouragement (exhortation)','Miséricorde','Service et aide','Générosité (don)','Direction (leadership)','Prophétie','Évangélisation','Autre'];
 const SPEC=[
 ['Informations spirituelles',[
 ['christ_yn','Avez-vous accepté Jésus-Christ comme Seigneur et Sauveur ?','yn'],
@@ -598,13 +627,13 @@ const SPEC=[
 ['other_church','Avez-vous fréquenté une autre église auparavant ?','yn'],
 ['other_church_name','Si oui, laquelle ?','text',null,'a_other_church=Oui'],
 ['since','Depuis quand fréquentez-vous notre église ?','text'],
-['wants_member','Souhaitez-vous devenir membre officiel de l’église ?','yn']]],
+['wants_member','Souhaitez-vous devenir membre officiel de l’église ?','sel',['Déjà membre','Oui','Pas encore','Non']]]],
 ['Implication dans le ministère',[
 ['serving','Servez-vous actuellement dans un ministère ?','yn'],
 ['serving_which','Si oui, lequel ?','text',null,'a_serving=Oui'],
-['wants_serve','Dans quel(s) ministère(s) aimeriez-vous servir ?','chk',MIN],
-['wants_serve_other','Autre ministère (précisez)','text'],
-['gifts','Quels dons spirituels, talents ou compétences Dieu vous a-t-Il donnés ?','area'],
+['serve_areas','Dans quels domaines de service aimeriez-vous contribuer au sein de l’Église ?','chk',SERVE],
+['gifts_list','Quels sont vos dons spirituels ?','chk',GIFTS],
+['gifts','Autres dons, talents ou compétences (précisez)','area'],
 ['volunteer','Seriez-vous disposé(e) à servir comme bénévole lors des activités spéciales ?','yn']]],
 ['Communion et croissance spirituelle',[
 ['cell','Participez-vous à un groupe de maison, une cellule ou une étude biblique ?','yn'],
