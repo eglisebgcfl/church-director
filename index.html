@@ -208,6 +208,9 @@ tagline:['Annuaire et suivi des présences','Directory and attendance tracking']
 nologin:['Aucun compte nécessaire','No account needed'],
 staffsub:['Pasteur, administrateurs et responsables de ministère','Pastor, administrators and ministry leaders'],
 est:['Fondée en 2016','Established 2016'],
+evpub:['Visible par tous (sans connexion)','Visible to everyone (no login)'],
+whylogin:['Cette fonction affiche des informations personnelles : elle est réservée aux responsables.','This function shows personal information, so it is only for authorized leaders.'],
+pubminnote:['Pour voir les membres, les présences et les rapports, connectez-vous.','To see members, attendance and reports, log in.'],
 manage:['Gérer','Manage'],rep1:['Rapport','Report'],allmin:['Tous les ministères','All ministries'],
 nomembers:['Aucun membre pour le moment. Cliquez sur « Ajouter un nouveau membre » pour commencer.','No members yet. Click “Add a new member” to start.'],
 needlogin:['Connectez-vous pour utiliser cette fonction.','Log in to use this function.'],openapp:['Ouvrir l’application','Open the app'],
@@ -255,6 +258,8 @@ searchmem:'Chèche yon manm pou ajoute (omwen 2 lèt)',copym:'Kopye manm yo soti
 nodata2:'Anrejistre prezans yo anvan nan onglè Prezans (chwazi gwoup la ak dat la, epi klike sou Anrejistre).',
 copyt:'Kopye rezime a',copied:'Rezime kopye.',
 tagline:'Anyè ak swivi prezans',nologin:'Pa bezwen kont',staffsub:'Pastè, administratè ak responsab minis yo',est:'Fonde nan 2016',
+evpub:'Tout moun ka wè l (san koneksyon)',whylogin:'Fonksyon sa a montre enfòmasyon pèsonèl, se sèlman pou responsab yo.',
+pubminnote:'Pou wè manm yo, prezans yo ak rapò yo, konekte.',
 manage:'Jere',rep1:'Rapò',allmin:'Tout minis yo',
 nomembers:'Poko gen manm. Klike sou « Ajoute yon nouvo manm » pou kòmanse.',
 needlogin:'Konekte pou itilize fonksyon sa a.',openapp:'Louvri aplikasyon an',
@@ -410,7 +415,7 @@ function navTo(k){
   if(k==='new'){HOMEV=false;pubGo();return}
   if(k==='reg'){HOMEV=false;regGo();return}
   PUB=false;
-  if(!prof){NEXT=k;loginView(t('needlogin'),'login');return}
+  if(!prof){if(k==='min'){pubMin();return}if(k==='cal'){pubCal();return}NEXT=k;loginView(t('needlogin'),'login');return}
   HOMEV=false;tab=k;shell();
 }
 function render(){document.documentElement.lang=lang;document.documentElement.style.fontSize=fs+'px';if(PUB){pubView();return}if(HOMEV&&prof){homeView();return}prof?shell():loginView()}
@@ -433,7 +438,7 @@ function loginView(msg,mode){
   homeView();
 }
 function loginForm(msg){
-  $('#app').innerHTML=`<div class="mc"><div class="mc-nav">${tools()}${gnav(NEXT||'',true)}</div><main class="login"><h2>${t('staff')}</h2><p class="leg">${t('staffsub')}</p>${msg?`<p class="note">${msg}</p>`:''}
+  $('#app').innerHTML=`<div class="mc"><div class="mc-nav">${tools()}${gnav(NEXT||'',true)}</div><main class="login"><h2>${NEXT?t(NEXT):t('staff')}</h2><p class="leg">${t('staffsub')}</p>${msg?`<p class="note">${msg}</p>`:''}${NEXT?`<p class="leg">${t('whylogin')}</p>`:''}
   <form id="lf"><label>${t('email')}<input type="email" id="em" required autocomplete="username"></label>
   <label>${t('pw')}<input type="password" id="pw" required autocomplete="current-password"></label>
   <p class="msg" id="lm"></p><button class="btn">${t('login')}</button></form><p class="leg"><a href="#" onclick="loginView('','home');return false">${t('back')}</a></p></main></div>`;
@@ -945,6 +950,7 @@ async function viewCal(){
    <label>${t('evtitle')}<input name="title" required></label>
    <div class="row"><label>${t('date')}<input name="d" type="date" value="${ymd(new Date())}" required></label><label>${t('start')}<input name="s" type="time"></label><label>${t('end')}<input name="e" type="time"></label></div>
    <label>${t('minist')}<select name="g">${adm?`<option value="">${t('whole')}</option>`:''}${G.map(x=>`<option value="${x.id}">${gname(x)}</option>`).join('')}</select></label>
+   <label class="chk"><input type="checkbox" name="pub" checked> ${t('evpub')}</label>
    <label>${t('loc')}<input name="l"></label><label>${t('lnote')}<input name="n"></label>
    <button class="btn">${t('save')}</button><p class="msg" id="em"></p></form></details>`:'';
   m.innerHTML=`<div class="prt"><img src="${LOGO}" alt=""><br><strong>${esc(CHURCH)}</strong><br>${esc(title)}</div>
@@ -956,10 +962,35 @@ async function viewCal(){
   +bar(false);
 }
 async function saveEv(e){e.preventDefault();const f=e.target,v=n=>f.elements[n].value.trim();
-  const {error}=await sb.from('events').insert({title:v('title'),event_date:v('d'),start_time:v('s')||null,end_time:v('e')||null,group_id:v('g')||null,location:v('l')||null,notes:v('n')||null});
+  const {error}=await sb.from('events').insert({title:v('title'),event_date:v('d'),start_time:v('s')||null,end_time:v('e')||null,group_id:v('g')||null,location:v('l')||null,notes:v('n')||null,is_public:f.elements.pub.checked});
   if(error)return $('#em').textContent=t('err')+error.message;
   const d=new Date(v('d')+'T00:00:00');calM=new Date(d.getFullYear(),d.getMonth(),1);viewCal()}
 async function delEv(id){if(!confirm(t('del')+' ?'))return;await sb.from('events').delete().eq('id',id);viewCal()}
+
+/* ---------- Public pages: ministries and calendar (no login) ---------- */
+async function pubMin(){
+  PUB=true;pubShell('min');pubView=pubMin;
+  const {data,error}=await sb.rpc('public_ministries');
+  const L=data||[],by={};L.forEach(x=>{(by[x.category||'']??=[]).push(x)});
+  const keys=Object.keys(by).sort((a,b)=>(a===''?1:0)-(b===''?1:0)||a.localeCompare(b));
+  $('#main').innerHTML=`<h2>${t('min')}</h2>${error?`<p class="msg">${t('err')}${esc(error.message)}</p>`:''}`
+   +keys.map(k=>(k?`<h2 class="sp">${esc(k)}</h2>`:(keys.length>1?`<h2 class="sp">${t('othercat')}</h2>`:''))+by[k].map(x=>`<div class="pr"><span><strong>${gname(x)}</strong></span></div>`).join('')).join('')
+   +`<p class="leg">${t('pubminnote')}</p><div class="row"><button class="btn" onclick="NEXT='min';loginView('','login')">${t('staff')}</button></div>`;
+}
+function pubCalGo(n){calM=new Date(calM.getFullYear(),calM.getMonth()+n,1);pubCal()}
+async function pubCal(){
+  PUB=true;pubShell('cal');pubView=pubCal;
+  const y=calM.getFullYear(),mo=calM.getMonth();
+  const {data,error}=await sb.rpc('public_events',{d1:ymd(new Date(y,mo,1)),d2:ymd(new Date(y,mo+1,0))});
+  const L=data||[],title=calM.toLocaleDateString(loc(),{month:'long',year:'numeric'});
+  const gp=x=>x.group_fr?(lang==='fr'?x.group_fr:lang==='en'?x.group_en:(x.group_ht||x.group_fr)):t('whole');
+  SHARE={subject:`${CHURCH}: ${t('cal')} ${title}`,text:`${CHURCH}\n${title}\n\n`+(L.length?L.map(x=>{const tm=[x.start_time,x.end_time].filter(Boolean).map(v=>v.slice(0,5)).join('-');return `- ${x.event_date.slice(8)}/${x.event_date.slice(5,7)} ${x.title}${tm?', '+tm:''}${x.location?', '+x.location:''}`}).join('\n'):t('noev'))};
+  $('#main').innerHTML=`<div class="prt"><img src="${LOGO}" alt=""><br><strong>${esc(CHURCH)}</strong><br>${esc(title)}</div>
+  <div class="row noprint"><button class="btn alt" onclick="pubCalGo(-1)" aria-label="‹">‹</button><h2 style="flex:3;text-align:center;align-self:center">${esc(title)}</h2><button class="btn alt" onclick="pubCalGo(1)" aria-label="›">›</button></div>`
+  +bar(false)+(error?`<p class="msg">${t('err')}${esc(error.message)}</p>`:'')
+  +(L.length?L.map(x=>{const d=new Date(x.event_date+'T00:00:00'),tm=[x.start_time,x.end_time].filter(Boolean).map(v=>v.slice(0,5)).join(' - ');
+    return `<div class="pr"><span class="mb"><span class="ph">${d.getDate()}</span><span><strong>${esc(x.title)}</strong><br><small class="mut">${esc(d.toLocaleDateString(loc(),{weekday:'long'}))}${tm?', '+esc(tm):''}${x.location?', '+esc(x.location):''}<br>${esc(gp(x))}${x.notes?', '+esc(x.notes):''}</small></span></span></div>`}).join(''):`<p>${t('noev')}</p>`);
+}
 
 /* ---------- Public form: no login needed ---------- */
 let PUB=false,PTOK=null,pubView=()=>{};
