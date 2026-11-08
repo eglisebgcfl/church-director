@@ -76,6 +76,7 @@ details form{padding:.75rem 0}
 .big strong{display:block;font-size:1.05rem}
 .big small{display:block;opacity:.85}
 .srch{width:100%;margin:.5rem 0}
+.pr{flex-wrap:wrap}
 .note{background:#fff7e0;border:1px solid #f0d58a;color:#5a4300;padding:.6rem .8rem;border-radius:8px;margin:.6rem 0}
 .s4 div{min-width:4.5rem}
 .foot{margin-top:auto;text-align:center;color:var(--mut);font-size:.85rem;padding-top:1.5rem}
@@ -207,6 +208,7 @@ tagline:['Annuaire et suivi des présences','Directory and attendance tracking']
 nologin:['Aucun compte nécessaire','No account needed'],
 staffsub:['Pasteur, administrateurs et responsables de ministère','Pastor, administrators and ministry leaders'],
 est:['Fondée en 2016','Established 2016'],
+manage:['Gérer','Manage'],rep1:['Rapport','Report'],allmin:['Tous les ministères','All ministries'],
 nomembers:['Aucun membre pour le moment. Cliquez sur « Ajouter un nouveau membre » pour commencer.','No members yet. Click “Add a new member” to start.'],
 needlogin:['Connectez-vous pour utiliser cette fonction.','Log in to use this function.'],openapp:['Ouvrir l’application','Open the app'],
 P1:['Présents','Present'],R1:['En retard','Late'],A1:['Absents','Absent'],unm:['Non marqués','Not marked'],
@@ -253,6 +255,7 @@ searchmem:'Chèche yon manm pou ajoute (omwen 2 lèt)',copym:'Kopye manm yo soti
 nodata2:'Anrejistre prezans yo anvan nan onglè Prezans (chwazi gwoup la ak dat la, epi klike sou Anrejistre).',
 copyt:'Kopye rezime a',copied:'Rezime kopye.',
 tagline:'Anyè ak swivi prezans',nologin:'Pa bezwen kont',staffsub:'Pastè, administratè ak responsab minis yo',est:'Fonde nan 2016',
+manage:'Jere',rep1:'Rapò',allmin:'Tout minis yo',
 nomembers:'Poko gen manm. Klike sou « Ajoute yon nouvo manm » pou kòmanse.',
 needlogin:'Konekte pou itilize fonksyon sa a.',openapp:'Louvri aplikasyon an',
 P1:'Prezan',R1:'An reta',A1:'Absan',unm:'Pa make',savedyes:'Prezans anrejistre pou dat sa a.',savedno:'Poko anrejistre pou dat sa a.',
@@ -465,6 +468,7 @@ async function viewAtt(){
   m.innerHTML=`<div class="row"><select id="g">${gs.map(g=>`<option value="${g.id}">${gname(g)}</option>`).join('')}</select>
   <button class="btn alt sm" style="flex:none;min-width:0" onclick="shiftD(-7)" aria-label="-7">‹</button><input type="date" id="d" value="${today()}" aria-label="${t('date')}"><button class="btn alt sm" style="flex:none;min-width:0" onclick="shiftD(7)" aria-label="+7">›</button></div>
   <p class="leg">${t('leg')}</p><div id="list"></div><p class="msg" id="m2"></p>`;
+  if(PRESEL&&gs.some(x=>x.id===PRESEL))$('#g').value=PRESEL;PRESEL=null;
   $('#g').onchange=$('#d').onchange=loadAtt;
   loadAtt();
 }
@@ -530,6 +534,7 @@ async function viewRep(){
   if(!gs||!gs.length){m.innerHTML=`<p>${t('nog')}</p>`;return}
   m.innerHTML=`<div class="row noprint"><select id="rg"><option value="all">${t('allg')}</option>${gs.map(g=>`<option value="${g.id}">${gname(g)}</option>`).join('')}</select><label>${t('from')}<input type="date" id="rf" value="${ago()}"></label><label>${t('to')}<input type="date" id="rt" value="${today()}"></label><button class="btn" onclick="runRep(RP.gs)">${t('gen')}</button></div><div id="rout"></div>`;
   RP.gs=gs;
+  if(PRESEL&&gs.some(x=>x.id===PRESEL))$('#rg').value=PRESEL;PRESEL=null;
   ['rg','rf','rt'].forEach(i=>{$('#'+i).onchange=()=>runRep(gs)});
   runRep(gs);
 }
@@ -866,7 +871,7 @@ async function viewMin(){
   (ld.data||[]).forEach(x=>{(lead[x.group_id]??=[]).push(nm[x.user_id]||'?')});
   const all=g.data||[],on=all.filter(x=>x.active),off=all.filter(x=>!x.active);
   const cats=[...new Set(all.map(x=>x.category).filter(Boolean))].sort();
-  const row=x=>`<div class="pr"><span><strong>${gname(x)}</strong><br><small class="mut">${cnt[x.id]||0} ${t('mem')}${lead[x.id]?', '+esc(lead[x.id].join(', ')):''}</small></span><button class="btn alt sm" onclick="openMin('${x.id}')">${adm?t('edit'):t('mem')}</button></div>`;
+  const row=x=>`<div class="pr"><span><strong>${gname(x)}</strong><br><small class="mut">${cnt[x.id]||0} ${t('mem')}${lead[x.id]?', '+esc(lead[x.id].join(', ')):''}</small></span><span class="acts" style="flex-wrap:wrap;justify-content:flex-end"><button class="btn alt sm" onclick="openMin('${x.id}')">${adm?t('manage'):t('mem')}</button><button class="btn alt sm" onclick="goAtt('${x.id}')">${t('att')}</button><button class="btn alt sm" onclick="goCal('${x.id}')">${t('cal')}</button><button class="btn alt sm" onclick="goRep('${x.id}')">${t('rep1')}</button></span></div>`;
   const by={};on.forEach(x=>{(by[x.category||'']??=[]).push(x)});
   const keys=Object.keys(by).sort((x,y)=>(x===''?1:0)-(y===''?1:0)||x.localeCompare(y));
   m.innerHTML=(adm?`<details${on.length?'':' open'}><summary class="btn">${t('addmin')}</summary><form onsubmit="addMin(event)">${minForm(null,cats)}<button class="btn">${t('save')}</button><p class="msg" id="mm"></p></form></details>`:'')
@@ -893,7 +898,7 @@ async function openMin(gid){
   MIN_IDS=new Set(mem.map(p=>p.id));
   const lids=new Set((ld.data||[]).map(x=>x.user_id)),leaders=(pf.data||[]).filter(x=>lids.has(x.id));
   const cats=adm?[...new Set((gs.data||[]).map(x=>x.category).filter(Boolean))]:[];
-  m.innerHTML=`<p><button class="btn alt sm" onclick="viewMin()">${t('back')}</button></p><h2>${gname(g.data)}</h2>`
+  m.innerHTML=`<p><button class="btn alt sm" onclick="viewMin()">${t('back')}</button></p><h2>${gname(g.data)}</h2>${minActs(gid)}`
   +(adm?`<details><summary class="btn alt">${t('edit')} ${t('minist')}</summary><form onsubmit="saveMin(event,'${gid}')">${minForm(g.data,cats)}<div class="row"><button class="btn">${t('save')}</button><button type="button" class="btn alt" onclick="setMinActive('${gid}',false)">${t('deact')}</button></div><p class="msg"></p></form></details>`:'')
   +(adm?`<h2 class="sp">${t('leaders')}</h2>`+leaders.map(x=>`<div class="pr"><span>${esc(x.full_name)}</span><button class="btn alt sm" onclick="rmLeader('${gid}','${x.id}')">${t('remove')}</button></div>`).join('')
     +`<div class="row"><select id="al">${(pf.data||[]).filter(x=>!lids.has(x.id)).map(x=>`<option value="${x.id}">${esc(x.full_name)}</option>`).join('')}</select><button class="btn alt" onclick="addLeader('${gid}')">${t('addleader')}</button></div>
@@ -918,6 +923,11 @@ async function newStaff(e,g){e.preventDefault();const f=e.target,o=f.querySelect
   if(error)return o.textContent=t('err')+error.message;openMin(g)}
 
 /* ---------- Calendar of events ---------- */
+let CALG=null,PRESEL=null;
+const minActs=id=>`<span class="acts" style="flex-wrap:wrap"><button class="btn alt sm" onclick="goAtt('${id}')">${t('att')}</button><button class="btn alt sm" onclick="goCal('${id}')">${t('cal')}</button><button class="btn alt sm" onclick="goRep('${id}')">${t('rep1')}</button></span>`;
+function goAtt(g){PRESEL=g;tab='att';shell()}
+function goRep(g){PRESEL=g;tab='rep';shell()}
+function goCal(g){CALG=g;tab='cal';shell()}
 let calM=(()=>{const d=new Date();d.setDate(1);return d})();
 const ymd=d=>new Date(d-d.getTimezoneOffset()*6e4).toISOString().slice(0,10);
 const loc=()=>lang==='en'?'en':'fr';
@@ -925,7 +935,7 @@ function calGo(n){calM=new Date(calM.getFullYear(),calM.getMonth()+n,1);viewCal(
 async function viewCal(){
   const m=$('#main'),adm=prof.role==='admin',y=calM.getFullYear(),mo=calM.getMonth();
   const [ev,g]=await Promise.all([
-    sb.from('events').select('*,groups(name_fr,name_en,name_ht)').gte('event_date',ymd(new Date(y,mo,1))).lte('event_date',ymd(new Date(y,mo+1,0))).order('event_date').order('start_time'),
+    (q=>CALG?q.eq('group_id',CALG):q)(sb.from('events').select('*,groups(name_fr,name_en,name_ht)')).gte('event_date',ymd(new Date(y,mo,1))).lte('event_date',ymd(new Date(y,mo+1,0))).order('event_date').order('start_time'),
     sb.from('groups').select('id,name_fr,name_en,name_ht').eq('active',true).order('name_fr')]);
   if(ev.error)return m.innerHTML=`<p>${t('err')}${esc(ev.error.message)}</p>`;
   const G=g.data||[],mine=new Set(G.map(x=>x.id)),L=ev.data||[];
@@ -939,7 +949,7 @@ async function viewCal(){
    <button class="btn">${t('save')}</button><p class="msg" id="em"></p></form></details>`:'';
   m.innerHTML=`<div class="prt"><img src="${LOGO}" alt=""><br><strong>${esc(CHURCH)}</strong><br>${esc(title)}</div>
   <div class="row noprint"><button class="btn alt" onclick="calGo(-1)" aria-label="‹">‹</button><h2 style="flex:3;text-align:center;align-self:center">${esc(title)}</h2><button class="btn alt" onclick="calGo(1)" aria-label="›">›</button></div>`
-  +`<div class="noprint">${form}</div>`+bar(false)
+  +`<div class="noprint"><select id="cg" onchange="CALG=this.value||null;viewCal()"><option value="">${t('allmin')}</option>${G.map(x=>`<option value="${x.id}"${CALG===x.id?' selected':''}>${gname(x)}</option>`).join('')}</select>${form}</div>`+bar(false)
   +(L.length?L.map(x=>{const d=new Date(x.event_date+'T00:00:00'),tm=[x.start_time,x.end_time].filter(Boolean).map(v=>v.slice(0,5)).join(' - ');
     const gn=x.groups?gname(x.groups):t('whole');
     return `<div class="pr"><span class="mb"><span class="ph">${d.getDate()}</span><span><strong>${esc(x.title)}</strong><br><small class="mut">${esc(d.toLocaleDateString(loc(),{weekday:'long'}))}${tm?', '+esc(tm):''}${x.location?', '+esc(x.location):''}<br>${gn}${x.notes?', '+esc(x.notes):''}</small></span></span>${adm||(x.group_id&&mine.has(x.group_id))?`<button class="btn alt sm noprint" onclick="delEv('${x.id}')">${t('del')}</button>`:''}</div>`}).join(''):`<p>${t('noev')}</p>`)
